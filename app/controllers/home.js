@@ -8,4 +8,3 @@ classController.error404 = function(req, res){
 }
 
 module.exports = classController;
-//module.exports = new controller();
