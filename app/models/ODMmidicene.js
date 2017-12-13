@@ -11,5 +11,5 @@ MediceneSchema.pre('save', function (done) {
     done();
 })
 
-var Medicene = mongoose.model("Medicene", MediceSchema);
+var Medicene = mongoose.model("Medicene", MediceneSchema);
 module.exports = Medicene;

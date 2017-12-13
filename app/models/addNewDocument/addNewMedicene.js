@@ -1,7 +1,7 @@
-var ORMmedicene = require("../models/ODMmidicene");
+    var ORMmedicene = require("../ODMmidicene");
 
-module.exports = function (body) {
-    var code = body.username,
+module.exports = function (body, next) {
+    var code = body.code,
         quantity = body.quantity,
         prize = body.prize;
 

@@ -1,0 +1,11 @@
+<% include _header %>
+<div>
+<h1>Register medicene</h1>
+<form action="/registerMedicene" method="post">
+    <input name="code" type="text" class="form-control " placeholder="Code" required autofocus>
+    <input name="quantity" type="number" class="form-control form-check-input" placeholder="Quantity" required>
+    <input name="prize" type="number" class="form-controel form-check-input" placeholder="Value" required>
+    <input type="submit" value="Sign up medicene" class="btn btn-primary btn-block">
+</form>
+</div>
+<% include _footer %>
