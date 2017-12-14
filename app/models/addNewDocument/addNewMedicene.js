@@ -1,14 +1,15 @@
-    var ORMmedicene = require("../ODMmidicene");
+var medicine = require("../MongooseODM/midicine");
 
 module.exports = function (body, next) {
     var code = body.code,
         quantity = body.quantity,
         prize = body.prize;
 
-    var newORMmedicene = new ORMmedicene({
+    var newMedicine = new medicine({
         code: code,
         quantity: quantity,
         prize: prize
     })
-    newORMmedicene.save(next);
+    newMedicine.save(next);
+
 }

@@ -1,15 +1,15 @@
 var mongoose = require('mongoose');
 
-var MediceneSchema = mongoose.Schema({
+var MedicineSchema = mongoose.Schema({
     code: { type: String, required: true, unique: true },
     quantity: { type: Number, required: true },
     prize: { type: Number, required: true },
     creatAt: { type: Date, default: Date.now }
 });
 
-MediceneSchema.pre('save', function (done) {
+MedicineSchema.pre('save', function (done) {
     done();
 })
 
-var Medicene = mongoose.model("Medicene", MediceneSchema);
-module.exports = Medicene;
+var Medicine = mongoose.model("Medicine", MedicineSchema);
+module.exports = Medicine;

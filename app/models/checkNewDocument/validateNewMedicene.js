@@ -1,12 +1,12 @@
-var ORMmedicene = require("../ODMmidicene");
+var medicine = require("../MongooseODM/midicine");
 
 module.exports = function (body) {
     var code = body.code;
 
     // check this is document in date base.
-   return ORMmedicene.findOne({ code: code }, function (err, medicene) {
+   return medicine.findOne({ code: code }, function (err, medicine) {
         if (err) { return next(err); }
-        if (medicene) {
+        if (medicine) {
             return true;
         }
         // there is no document in date base.
