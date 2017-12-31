@@ -1,12 +1,14 @@
-var flashFeedbackUser = require('../models/classes/flash')
-    , User = require('../models/MongooseODM/user')
+const User = require('../models/MongooseODM/user')
+    , flashUser = require('../models/flashUser')
     , Token = require('../models/MongooseODM/token')
-    , nodemailer = require('nodemailer');
+    , nodemailer = require('nodemailer')
+    , secretCrypt = require('../models/safety/secretCrypt')
+    , jwt = require('jsonwebtoken');
 
 userController = {};
 
 userController.login = function (req, res) {
-    flashFeedbackUser(req, res)
+    flashUser(req, res)
     res.render('login');
 }
 /**
@@ -14,15 +16,6 @@ userController.login = function (req, res) {
  * Sign in with email and password
  */
 userController.loginPost = function (req, res, next) {
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('email', 'Email cannot be blank').notEmpty();
-    req.assert('password', 'Password cannot be blank').notEmpty();
-    req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-
-    // Check for validation erro
-    var errors = req.validationErrors();
-    if (errors) return res.status(400).send(errors);
 
     User.findOne({ email: req.body.email }, function (err, user) {
         if (!user) return res.status(401).send({
@@ -39,16 +32,16 @@ userController.loginPost = function (req, res, next) {
                 type: 'not-verified',
                 msg: 'Your account has not been verified.'
             });
-
-            // Login successful, write token, and send back user
-            res.send({ token: generateToken(user), user: user.toJSON() });
+            var token = user.tokens.token;
+            res.header('x-auth', token).send(user);
         });
     });
 };
 
 
+
 userController.registerUser = function (req, res) {
-    flashFeedbackUser(req, res)
+    flashUser(req, res);
     res.render('registerUser');
 }
 
@@ -56,69 +49,72 @@ userController.registerUser = function (req, res) {
  * POST /registerUserPost
  */
 userController.registerUserPost = function (req, res, next) {
-       /*
-        req.assert('name', 'Name cannot be blank').notEmpty();
-        req.assert('email', 'Email is not valid').isEmail();
-        req.assert('email', 'Email cannot be blank').notEmpty();
-        req.assert('password', 'Password must be at least 4 characters long').len(4);
-        req.sanitize('email').normalizeEmail({ remove_dots: false });
+    flashUser(req, res);
+    // make sure user doesn't comfirm terms
+    console.log("serve: " + req.body.checkboxTermsOfService);
 
-        // Check for validation errors    
-        var errors = req.validationErrors();
-        if (errors) { return res.status(400).send(errors); }
-        */
+    if (req.body.checkboxTermsOfService === false) {
+        return res.status(428).send({ msg: 'the terms of services do not was applay' });
+    }
 
-        // Make sure this account doesn't already exist
-        User.findOne({ email: req.body.email }, function (err, user) {
+    // Make sure this account doesn't already exist
+    User.findOne({ email: req.body.email }, function (err, user) {
 
-            // Make sure user doesn't already exist
-            if (user) return res.status(400).send({ msg: 'The email address you have entered is already associated with another account.' });
+        // Make sure user doesn't already exist
+        if (user) return res.status(400).send({ msg: 'The email address you have entered is already associated with another account.' });
 
-            // Create and save the user
-            user = new User({ name: req.body.name, phone: req.body.phone, email: req.body.email, password: req.body.password });
-            user.save(function (err) {
+        // Create and save the user
+        user = new User({ name: req.body.name, phone: req.body.phone, email: req.body.email, password: req.body.password });
+        user.save(function (err, next) {
+            
+            if (err) { return res.status(500).send({ msg: err.message }); }
+           /* 
+            req.flash('info', `the new user ${user.name} registered successful/n 
+                                   the number of Id for login is: ${user.name}.`);
+            res.redirect('/registerUser');
+            */
+            
+            var tokenUserId = jwt.sign({_id: user._id.toHexString()}, secretCrypt.hashedPassword);
+           
+            // Create a verification token for this user
+            var token = new Token({ _userId: user._id, token: tokenUserId });
+
+            // Save the verification token
+            token.save(function (err) {
                 if (err) { return res.status(500).send({ msg: err.message }); }
-
-                // Create a verification token for this user
-                var token = new Token({ _userId: user._id, token: "çaksjdfçakspéoirpeoeiçldfasdç" });
-
-                // Save the verification token
-                token.save(function (err) {
+                
+                res.locals.token = req.flash('token');
+                req.flash('token',  token.token );
+                res.render('confirmToken', { token: "/confirmation?token=" + token.token});
+                
+                /*
+                // Send the email
+                let transporter = nodemailer.createTransport({
+                    host: 'smtp.ethereal.email',
+                    port: 587,
+                    secure: false, // true for 465, false for other ports
+                    auth: {
+                        user: "al@gmail", // generated ethereal user
+                        pass: "account.pass"  // generated ethereal password
+                    }
+                });                    
+                var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+                transporter.sendMail(mailOptions, function (err) {
                     if (err) { return res.status(500).send({ msg: err.message }); }
-
-                    // Send the email
-                    let transporter = nodemailer.createTransport({
-                        host: 'smtp.ethereal.email',
-                        port: 587,
-                        secure: false, // true for 465, false for other ports
-                        auth: {
-                            user: account.user, // generated ethereal user
-                            pass: account.pass  // generated ethereal password
-                        }
-                    });                    
-                    var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
-                    transporter.sendMail(mailOptions, function (err) {
-                        if (err) { return res.status(500).send({ msg: err.message }); }
-                        res.status(200).send('A verification email has been sent to ' + user.email + '.');
-                    });
+                    res.status(200).send('A verification email has been sent to ' + user.email + '.');
                 });
+                */
             });
         });
-    };
+    });
+};
 
 
-userController.confirmationPost  = function (req, res, next) {
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('email', 'Email cannot be blank').notEmpty();
-    req.assert('token', 'Token cannot be blank').notEmpty();
-    req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-    // Check for validation errors    
-    var errors = req.validationErrors();
-    if (errors) return res.status(400).send(errors);
-
+userController.confirmationRegisterUser = function (req, res, next) {
+     
     // Find a matching token
-    Token.findOne({ token: req.body.token }, function (err, token) {
+    Token.findOne({ token: req.query.token }, function (err, token) {
+    
         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
 
         // If we found a token, find a matching user
@@ -137,13 +133,7 @@ userController.confirmationPost  = function (req, res, next) {
 };
 
 userController.resendTokenPost = function (req, res, next) {
-    req.assert('email', 'Email is not valid').isEmail();
-    req.assert('email', 'Email cannot be blank').notEmpty();
-    req.sanitize('email').normalizeEmail({ remove_dots: false });
-
-    // Check for validation errors    
-    var errors = req.validationErrors();
-    if (errors) return res.status(400).send(errors);
+    
 
     User.findOne({ email: req.body.email }, function (err, user) {
         if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });

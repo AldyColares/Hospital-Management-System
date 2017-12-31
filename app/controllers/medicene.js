@@ -1,22 +1,24 @@
-var validateNewMedicene = require("../models/checkNewDocument/validateNewMedicene");
-var addNewMedicene = require("../models/addNewDocument/addNewMedicene");
-var controllerRegister = {};
+const validateNewMedicene = require("../models/checkNewDocument/validateNewMedicene")
+   ,  addNewMedicene = require("../models/addNewDocument/addNewMedicene")
+   ,  flashUser = require('../models/flashUser')
+var  controllerRegister = {};
 
 controllerRegister.register = function (req, res, next) {
-    res.locals.currentUser = req.user;
+    flashUser(req, res);
     var existDocument = validateNewMedicene(req.body);
-    if (existDocument) {
-        res.locals.errors = req.flash("error");    
+    if (existDocument === true) {
+           
         req.flash("error", "Code already exists");
         return res.redirect("/registerMedicene");
     }
     addNewMedicene(req.body, next);
+
+    req.flash("info", `The of code medicene: ${req.body.code} registered successful`);
+    return res.redirect("/registerMedicene");
 }
 
 controllerRegister.registerMedicene = function (req, res) {
-    res.locals.currentUser = req.user;    
-    res.locals.errors = req.flash("error");
-    res.locals.infos = req.flash("info");
+    flashUser(req, res);
     res.render('registerMedicene');
 }
 module.exports = controllerRegister;

@@ -1,12 +1,33 @@
 <% include _header %>
-<div>
-<h1>Register User</h1>
-<form action="/registerUser" method="post">
-    <input name="name" type="text" class="form-control " placeholder="Name" required autofocus>
-    <input name="password" type="password" class="form-control form-check-input" placeholder="Password" required>
-    <input name="phone" type="number" class="form-control form-check-input" placeholder="Phone" required>
-    <input name="email" type="email" class="form-control form-check-input" placeholder="Email" required> 
-    <input type="submit" value="Sign up medicene" class="btn btn-primary btn-block">
-</form>
-</div>
-<% include _footer %>
+    <div class="center">
+        <div class="form-group col-xs-6">
+        <h1>Register User</h1>
+        <form action="/registerUser" method="post">
+            <input name="name" type="text" class="form-control " placeholder="Name" required autofocus>
+            <input name="password" type="password" class="form-control form-check-input" placeholder="Password" required>
+            <input name="phone" type="number" class="form-control form-check-input" placeholder="Phone" required>
+            <input name="email" type="email" class="form-control form-check-input" placeholder="Email" required>  
+                <select>
+                    <option value="Patient">Patient</option>
+                    <option value="Doctor">Doctor</option>
+                    <option value="Nurse">Nurse</option>
+                    <option value="Receptionist">Receptionist</option>
+                    <option value="Pharmacist">Pharmacist</option>
+                    <option value="Accountant">Accountant</option>
+                    <option value="Laboratorist">Laboratorist</option>
+                </select>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input name="checkboxTermsOfService" type="checkbox" value="false" required> Ao criar a conta, você está aceitando os
+                        <a href="/termsofService">termos de serviços.</a>
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Sign up medicene" class="btn btn-primary btn-block">
+            </div>
+        </form>
+    </div>
+    </div> 
+    <% include _footer %>

@@ -7,6 +7,6 @@ module.exports = function (app) {
     app.get('/registerUser', userController.registerUser)
     app.post('/registerUser', userController.registerUserPost);
 
-    app.post('/confirmation', userController.confirmationPost);
+    app.get('/confirmation', userController.confirmationRegisterUser);
     app.post('/resend', userController.resendTokenPost);
 }
