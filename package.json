@@ -5,7 +5,7 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js --trace-sync-io"
   },
   "author": "aldy colares de souza",
   "license": "ISC",
@@ -14,20 +14,20 @@
     "body-parser": "^1.18.2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
+    "cookie-session": "^2.0.0-beta.3",
     "crypto-js": "^3.1.9-1",
     "ejs": "^2.5.7",
-    "express": "^4.16.2",
-    "express-session": "^1.15.6",
+    "express": "^4.16.1",
     "express-validator": "^4.3.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
-    "mongoose": "^4.13.6",
+    "mongoose": "^4.13.8",
     "morgan": "^1.9.0",
     "nodemailer": "^4.4.1",
     "validator": "^9.2.0"
   },
   "devDependencies": {
-    "mocha": "4.0.1",
-    "nodemon": "1.12.1"
+    "mocha": "^4.1.0",
+    "nodemon": "^1.14.7"
   }
 }

@@ -4,9 +4,8 @@ var express = require('express')
   , logger = require('morgan')
   , bodyParser = require("body-parser")
   , flash = require("connect-flash") 
-  , session = require("express-session")
+  , session = require("cookie-session")
   , expressValidator = require('express-validator')
-  //, cookieParser = require("cookie-parser")
   
   , mongoose = require('./database')
   , home = require('../app/routes/home')
@@ -20,10 +19,14 @@ var app = express();
     // configuração de ambiente
     app.set('port', process.env.PORT || 3000);
 
+    const expiryDateInADay = new Date( Date.now() + 60 * 60 * 1000 * 24 ); // 24 hour
     app.use(session({
         secret: "TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX",
-        resave: true,
-        saveUninitialized: true
+	name: "sessionId",
+	httpOnly: "true",
+	segure: "true",
+	maxAge: expiryDateInADay
+	
     }));
 
     app.use(flash());

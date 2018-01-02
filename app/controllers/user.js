@@ -16,14 +16,26 @@ userController.login = function (req, res) {
  * Sign in with email and password
  */
 userController.loginPost = function (req, res, next) {
-
-    User.findOne({ email: req.body.email }, function (err, user) {
+    let body = req.body;
+    flashUser(req, res);
+    User.findOne({ name: body.name }, function (err, user) {
         if (!user) return res.status(401).send({
-            msg: 'The email address ' +
-                req.body.email + ' is not associated with any account.' +
+            msg: 'The email address ' + req.body.email + 
+                ' is not associated with any account.' +
                 'Double-check your email address and try again.'
         });
 
+        User.findByCredentials(user, body.password).then((user) => {
+            return user.generateAuthToken().then((token) => {
+                res.header('x-auth', token).send(user);
+            });
+        }).catch((e) => {
+            res.status(400).send();
+        });
+        res.locals.currentUser = body.name;
+	req.session.user = user;
+        res.status(200).render('mainPageUser');
+        /*  
         user.comparePassword(req.body.password, function (err, isMatch) {
             if (!isMatch) return res.status(401).send({ msg: 'Invalid email or password' });
 
@@ -35,9 +47,14 @@ userController.loginPost = function (req, res, next) {
             var token = user.tokens.token;
             res.header('x-auth', token).send(user);
         });
+        */
     });
 };
 
+userController.logOut =  function (req, res) {
+    req.session = null;	
+    res.redirect("/");
+};
 
 
 userController.registerUser = function (req, res) {
@@ -51,9 +68,9 @@ userController.registerUser = function (req, res) {
 userController.registerUserPost = function (req, res, next) {
     flashUser(req, res);
     // make sure user doesn't comfirm terms
-    console.log("serve: " + req.body.checkboxTermsOfService);
+    console.log("checkboxApplyTermsOfService: " + req.body.checkboxApplyTermsOfService);
 
-    if (req.body.checkboxTermsOfService === false) {
+    if (req.body.checkboxApplyTermsOfService !== "true") {
         return res.status(428).send({ msg: 'the terms of services do not was applay' });
     }
 
@@ -65,28 +82,30 @@ userController.registerUserPost = function (req, res, next) {
 
         // Create and save the user
         user = new User({ name: req.body.name, phone: req.body.phone, email: req.body.email, password: req.body.password });
+        console.log("job: " + req.body.job);
+        user.generateAuthToken(req.body.job);
         user.save(function (err, next) {
-            
+
             if (err) { return res.status(500).send({ msg: err.message }); }
-           /* 
-            req.flash('info', `the new user ${user.name} registered successful/n 
-                                   the number of Id for login is: ${user.name}.`);
-            res.redirect('/registerUser');
-            */
-            
-            var tokenUserId = jwt.sign({_id: user._id.toHexString()}, secretCrypt.hashedPassword);
-           
+            /* 
+             req.flash('info', `the new user ${user.name} registered successful/n 
+                                    the number of Id for login is: ${user.name}.`);
+             res.redirect('/registerUser');
+             */
+
+            var tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
+
             // Create a verification token for this user
             var token = new Token({ _userId: user._id, token: tokenUserId });
 
             // Save the verification token
             token.save(function (err) {
                 if (err) { return res.status(500).send({ msg: err.message }); }
-                
+
                 res.locals.token = req.flash('token');
-                req.flash('token',  token.token );
-                res.render('confirmToken', { token: "/confirmation?token=" + token.token});
-                
+                req.flash('token', token.token);
+                res.render('confirmToken', { token: "/confirmation?token=" + token.token });
+
                 /*
                 // Send the email
                 let transporter = nodemailer.createTransport({
@@ -111,10 +130,10 @@ userController.registerUserPost = function (req, res, next) {
 
 
 userController.confirmationRegisterUser = function (req, res, next) {
-     
+
     // Find a matching token
     Token.findOne({ token: req.query.token }, function (err, token) {
-    
+
         if (!token) return res.status(400).send({ type: 'not-verified', msg: 'We were unable to find a valid token. Your token my have expired.' });
 
         // If we found a token, find a matching user
@@ -133,7 +152,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 };
 
 userController.resendTokenPost = function (req, res, next) {
-    
+
 
     User.findOne({ email: req.body.email }, function (err, user) {
         if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });

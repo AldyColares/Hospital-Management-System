@@ -1,0 +1,8 @@
+<% include _header%>
+    <h1> Welcome the test dev! Please insert your login and password</h1>
+    <form action="/login", method="POST">
+        <input name="name" type="text" class="form-control" placeholder="Login" required autofocus>
+        <input name="password" type="password" class="form-control" placeholder="Password" required>
+        <input type="submit" value="login" class="btn btn-primary btn-block"> 
+    </form>
+<% include _footer %>

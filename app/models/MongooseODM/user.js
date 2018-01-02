@@ -36,7 +36,6 @@ var UserSchema = mongoose.Schema({
         require: true
     },
     phone: { type: String },
-    roles: [{ type: 'String' }],
     isVerified: { type: Boolean, default: false },
     password: String,
     passwordResetToken: String,
@@ -61,15 +60,15 @@ UserSchema.pre('save', function (done) {
     });
 
 })
+
 UserSchema.methods.checkPassword = function (guess, done) {
     bcrypt.compare(guess, this.password, function (err, isMatch) {
         done(err, isMatch);
     });
 };
 
-UserSchema.methods.generationAuthToken = function () {
+UserSchema.methods.generateAuthToken = function (access) {
     var user = this;
-    var access = user.tokens.access;
     var token = jwt.sign({ _id: user._id.toHexString(), access }, secretCrypt.hashedPassword).toString();
     user.tokens.push({ access, token });
 
@@ -78,15 +77,9 @@ UserSchema.methods.generationAuthToken = function () {
     });
 }
 
-UserSchema.statics.findByCrendentials = (email, password) => {
-    var User = this;
-
-    return User.findOne({ email }, ).then((user) => {
-        if (!user) {
-            return Promise.reject();
-        }
-        return new Promise((resolve, reject) => {
-            bcrypt.compate(password, user.password, (err, res) => {
+UserSchema.statics.findByCredentials = (user, loginPassword) => {
+    return new Promise((resolve, reject) => {
+            bcrypt.compare(password, user.password, (err, res) => {
                 if (res) {
                     resolve(res);
                 } else {
@@ -94,7 +87,6 @@ UserSchema.statics.findByCrendentials = (email, password) => {
                 }
             })
         });
-    });
 }
 
 var User = mongoose.model('User', UserSchema);
