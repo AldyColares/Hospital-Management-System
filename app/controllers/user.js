@@ -1,8 +1,11 @@
 const User = require('../models/MongooseODM/user')
     , flashUser = require('../models/flashUser')
     , Token = require('../models/MongooseODM/token')
-    , nodemailer = require('nodemailer')
     , secretCrypt = require('../models/safety/secretCrypt')
+    , generateIdLogin = require('../models/safety/generateIdLogin')
+
+    , nodemailer = require('nodemailer')
+    , _ = require('lodash')
     , jwt = require('jsonwebtoken');
 
 userController = {};
@@ -20,7 +23,7 @@ userController.loginPost = function (req, res, next) {
     flashUser(req, res);
     User.findOne({ name: body.name }, function (err, user) {
         if (!user) return res.status(401).send({
-            msg: 'The email address ' + req.body.email + 
+            msg: 'The email address ' + req.body.email +
                 ' is not associated with any account.' +
                 'Double-check your email address and try again.'
         });
@@ -33,7 +36,12 @@ userController.loginPost = function (req, res, next) {
             res.status(400).send();
         });
         res.locals.currentUser = body.name;
-	req.session.user = user;
+        // save session the id and access
+        let credentialUser = _.pick(user, ['name']);
+        // note dev: I am should going find out a function in the lodash.
+        credentialUser.access = user.tokens[0].access;
+        console.log("CredentialUser " + credentialUser.name, credentialUser.access);
+        req.session.user = credentialUser;
         res.status(200).render('mainPageUser');
         /*  
         user.comparePassword(req.body.password, function (err, isMatch) {
@@ -51,8 +59,8 @@ userController.loginPost = function (req, res, next) {
     });
 };
 
-userController.logOut =  function (req, res) {
-    req.session = null;	
+userController.logOut = function (req, res) {
+    req.session = null;
     res.redirect("/");
 };
 
@@ -82,7 +90,6 @@ userController.registerUserPost = function (req, res, next) {
 
         // Create and save the user
         user = new User({ name: req.body.name, phone: req.body.phone, email: req.body.email, password: req.body.password });
-        console.log("job: " + req.body.job);
         user.generateAuthToken(req.body.job);
         user.save(function (err, next) {
 
@@ -143,13 +150,15 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
             // Verify and save the user
             user.isVerified = true;
+            user.idLogin = generateIdLogin(user._id, user.name);
             user.save(function (err) {
                 if (err) { return res.status(500).send({ msg: err.message }); }
-                res.status(200).send("The account has been verified. Please log in.");
+                //res.status(200).send("The account has been verified. Please log in.");
             });
         });
-    });
-};
+    }
+    );
+}
 
 userController.resendTokenPost = function (req, res, next) {
 

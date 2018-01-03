@@ -16,10 +16,15 @@ var UserSchema = mongoose.Schema({
     email: {
         type: String,
         require: true,
+        unique: true,
         validate: {
             validator: validator.isEmail,
             massage: '{VALUE} is not a valid email'
         }
+    },
+    idLogin: {
+        type: Number,
+        default: 0
     },
     tokens: [{
         access: {
@@ -50,7 +55,7 @@ UserSchema.pre('save', function (done) {
     if (!user.isModified("password")) {
         return done();
     }
-    progress = function() {};
+    progress = function () { };
     bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
         bcrypt.hash(user.password, salt, progress, (err, hashedPassword) => {
             if (err) { return done(err); }
@@ -58,7 +63,6 @@ UserSchema.pre('save', function (done) {
             done();
         });
     });
-
 })
 
 UserSchema.methods.checkPassword = function (guess, done) {
@@ -79,14 +83,14 @@ UserSchema.methods.generateAuthToken = function (access) {
 
 UserSchema.statics.findByCredentials = (user, loginPassword) => {
     return new Promise((resolve, reject) => {
-            bcrypt.compare(password, user.password, (err, res) => {
-                if (res) {
-                    resolve(res);
-                } else {
-                    reject();
-                }
-            })
-        });
+        bcrypt.compare(password, user.password, (err, res) => {
+            if (res) {
+                resolve(res);
+            } else {
+                reject();
+            }
+        })
+    });
 }
 
 var User = mongoose.model('User', UserSchema);

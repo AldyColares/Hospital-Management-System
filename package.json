@@ -5,12 +5,12 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js --trace-sync-io"
+    "start": "nodemon app.js"
   },
   "author": "aldy colares de souza",
   "license": "ISC",
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.18.2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.3",
@@ -24,10 +24,11 @@
     "mongoose": "^4.13.8",
     "morgan": "^1.9.0",
     "nodemailer": "^4.4.1",
+    "short-id": "0.1.0-1",
     "validator": "^9.2.0"
   },
   "devDependencies": {
     "mocha": "^4.1.0",
-    "nodemon": "^1.14.7"
+    "nodemon": "^1.10.2"
   }
 }
