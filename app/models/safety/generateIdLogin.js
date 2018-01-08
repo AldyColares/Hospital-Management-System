@@ -1,7 +1,7 @@
 var ids = require('short-id');
 
 ids.configure({
-    length: 3,          // The length of the id strings to generate 
+    length: 4,          // The length of the id strings to generate 
     algorithm: 'sha1',  // The hashing algoritm to use in generating keys 
     salt: Math.random   // A salt value or function 
 });

@@ -1,3 +1,5 @@
+//import { error } from 'util';
+
 var mongoose = require('mongoose')
     , validator = require('validator')
     , bcrypt = require('bcrypt-nodejs')
@@ -72,6 +74,7 @@ UserSchema.methods.checkPassword = function (guess, done) {
 };
 
 UserSchema.methods.generateAuthToken = function (access) {
+    if (!access) return Promise.reject(new Error("access is undefined")); 
     var user = this;
     var token = jwt.sign({ _id: user._id.toHexString(), access }, secretCrypt.hashedPassword).toString();
     user.tokens.push({ access, token });

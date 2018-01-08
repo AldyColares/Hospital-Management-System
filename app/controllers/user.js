@@ -29,33 +29,19 @@ userController.loginPost = function (req, res, next) {
         });
 
         User.findByCredentials(user, body.password).then((user) => {
-            return user.generateAuthToken().then((token) => {
-                res.header('x-auth', token).send(user);
-            });
+            res.locals.currentUser = user.name;
+
+            // save session the id and access
+            let credentialUser = _.pick(user, ['name', 'idLogin']);
+            // note dev: I am should going find out a function in the lodash.
+            credentialUser.access = user.tokens;
+            //console.log("CredentialUser " + credentialUser.name, credentialUser.access);
+            req.session.user = credentialUser;
         }).catch((e) => {
+            console.error(e.message + '\n' + e.stack);
             res.status(400).send();
         });
-        res.locals.currentUser = body.name;
-        // save session the id and access
-        let credentialUser = _.pick(user, ['name']);
-        // note dev: I am should going find out a function in the lodash.
-        credentialUser.access = user.tokens[0].access;
-        console.log("CredentialUser " + credentialUser.name, credentialUser.access);
-        req.session.user = credentialUser;
         res.status(200).render('mainPageUser');
-        /*  
-        user.comparePassword(req.body.password, function (err, isMatch) {
-            if (!isMatch) return res.status(401).send({ msg: 'Invalid email or password' });
-
-            // Make sure the user has been verified
-            if (!user.isVerified) return res.status(401).send({
-                type: 'not-verified',
-                msg: 'Your account has not been verified.'
-            });
-            var token = user.tokens.token;
-            res.header('x-auth', token).send(user);
-        });
-        */
     });
 };
 
@@ -81,6 +67,8 @@ userController.registerUserPost = function (req, res, next) {
     if (req.body.checkboxApplyTermsOfService !== "true") {
         return res.status(428).send({ msg: 'the terms of services do not was applay' });
     }
+
+    // make sure job doesn't exist of the list job of hospital.
 
     // Make sure this account doesn't already exist
     User.findOne({ email: req.body.email }, function (err, user) {
@@ -161,7 +149,6 @@ userController.confirmationRegisterUser = function (req, res, next) {
 }
 
 userController.resendTokenPost = function (req, res, next) {
-
 
     User.findOne({ email: req.body.email }, function (err, user) {
         if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });

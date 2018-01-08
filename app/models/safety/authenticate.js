@@ -1,18 +1,16 @@
-var {User} = require('./../MongooseODM/user');
+//var {User} = require('./../MongooseODM/user');
+
 
 var authenticate = (req, res, next) => {
-  var token = req.header('x-auth');
-
-  User.findByToken(token).then((user) => {
-    if (!user) {
-      return Promise.reject();
+  let session = req.session;
+    if (!session) {
+      res.status(401); 
+      req.flash("info", "You must be logged in to see this page.");
+      res.redirect("/login");;
     }
-    req.user = user;
-    req.token = token;
     next();
-  }).catch((e) => {
-    res.status(401).send();
-  });
 };
+
+
 
 module.exports = {authenticate};
