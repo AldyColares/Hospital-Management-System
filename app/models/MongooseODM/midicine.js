@@ -9,7 +9,7 @@ var MedicineSchema = mongoose.Schema({
 
 MedicineSchema.pre('save', function (done) {
     done();
-})
+});
 
 var Medicine = mongoose.model("Medicine", MedicineSchema);
 module.exports = Medicine;

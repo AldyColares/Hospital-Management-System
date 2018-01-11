@@ -1,7 +1,5 @@
-//import { error } from 'util';
-
+/*jshint esversion: 6 */
 var mongoose = require('mongoose'),
-    validator = require('validator'),
     bcrypt = require('bcrypt-nodejs'),
     secretCrypt = require('../safety/secretCrypt'),
     jwt = require('jsonwebtoken');
@@ -13,29 +11,33 @@ var UserSchema = mongoose.Schema({
         type: String,
         require: true,
         unique: true,
-
+        validate: {
+            validator:function(v) {
+                return /^[a-zA-Z]+$/.test(v);
+            },
+            message: '{VALUE} is can not exist number!'
+        }
     },
     password: {
         type: String,
-        require: true
+        require: true,
+        min: 6
     },
     email: {
         type: String,
-        require: true,
         unique: true,
+        lowercare: true,
         validate: {
-            isAsync: true,
-
-            validator: {
-                function(v) {
-                   return ;
-                }
-            }
-        }
+            validator: function(v){
+                return /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]{2,}$/.test(v);
+            },
+            message: '{VALUE} is not email address valide!'
+        }, 
+        required: [true, 'User email required']
+        
     },
     idLogin: {
         type: String,
-        unique: true
     },
     tokens: [{
         access: {
@@ -58,15 +60,13 @@ var UserSchema = mongoose.Schema({
     creatAt: { type: Date, default: Date.now }
 });
 
-UserSchema.pre('save', function (done) {
+UserSchema.pre('save', function(err) {
     // user below is a document object mongoose.
     var user = this;
     user.validate(function (err) {
-        for (proprety in err.errors) {
-            console.log(`${proprety} : ${err.errors[proprety]}`);
-        }
-        done(new Error("error save new user"));
+        return done(err);
     });
+
     //Returns true if this document was modified.
     if (!user.isModified("password")) {
         return done();
