@@ -5,11 +5,11 @@ var express = require('express')
   , bodyParser = require("body-parser")
   , flash = require("connect-flash") 
   , session = require("cookie-session")
-  , expressValidator = require('express-validator')
   
   , mongoose = require('./database')
   , home = require('../app/routes/home')
   , medicene = require('../app/routes/medicene')
+  , mainPageUser = require('../app/routes/mainPageUser')
   , login = require('../app/routes/user');
 
 module.exports = function(){
@@ -32,13 +32,12 @@ var app = express();
     app.use(flash());
     app.use(bodyParser.urlencoded({ extended: false }));
     
-    //app.use(expressValidator);
-
     // middleware
     app.use(express.static('./public'));  
     app.set('view engine', 'ejs');
     app.set('views', './app/views');
     //app.set('views', path.resolve(__dirname, "views"));
+    mainPageUser(app);
     login(app);
     medicene(app);
     home(app);

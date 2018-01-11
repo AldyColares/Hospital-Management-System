@@ -1,10 +1,10 @@
 //import { error } from 'util';
 
-var mongoose = require('mongoose')
-    , validator = require('validator')
-    , bcrypt = require('bcrypt-nodejs')
-    , secretCrypt = require('../safety/secretCrypt')
-    , jwt = require('jsonwebtoken');
+var mongoose = require('mongoose'),
+    validator = require('validator'),
+    bcrypt = require('bcrypt-nodejs'),
+    secretCrypt = require('../safety/secretCrypt'),
+    jwt = require('jsonwebtoken');
 
 const SALT_FACTOR = 10;
 
@@ -12,21 +12,30 @@ var UserSchema = mongoose.Schema({
     name: {
         type: String,
         require: true,
-        unique: true
+        unique: true,
+
     },
-    password: { type: String, require: true },
+    password: {
+        type: String,
+        require: true
+    },
     email: {
         type: String,
         require: true,
         unique: true,
         validate: {
-            validator: validator.isEmail,
-            massage: '{VALUE} is not a valid email'
+            isAsync: true,
+
+            validator: {
+                function(v) {
+                   return ;
+                }
+            }
         }
     },
     idLogin: {
-        type: Number,
-        default: 0
+        type: String,
+        unique: true
     },
     tokens: [{
         access: {
@@ -44,15 +53,20 @@ var UserSchema = mongoose.Schema({
     },
     phone: { type: String },
     isVerified: { type: Boolean, default: false },
-    password: String,
     passwordResetToken: String,
     passwordResetExpires: Date,
     creatAt: { type: Date, default: Date.now }
-})
+});
 
 UserSchema.pre('save', function (done) {
     // user below is a document object mongoose.
     var user = this;
+    user.validate(function (err) {
+        for (proprety in err.errors) {
+            console.log(`${proprety} : ${err.errors[proprety]}`);
+        }
+        done(new Error("error save new user"));
+    });
     //Returns true if this document was modified.
     if (!user.isModified("password")) {
         return done();
@@ -65,7 +79,7 @@ UserSchema.pre('save', function (done) {
             done();
         });
     });
-})
+});
 
 UserSchema.methods.checkPassword = function (guess, done) {
     bcrypt.compare(guess, this.password, function (err, isMatch) {
@@ -74,7 +88,7 @@ UserSchema.methods.checkPassword = function (guess, done) {
 };
 
 UserSchema.methods.generateAuthToken = function (access) {
-    if (!access) return Promise.reject(new Error("access is undefined")); 
+    if (!access) return Promise.reject(new Error("access is undefined"));
     var user = this;
     var token = jwt.sign({ _id: user._id.toHexString(), access }, secretCrypt.hashedPassword).toString();
     user.tokens.push({ access, token });
@@ -82,19 +96,19 @@ UserSchema.methods.generateAuthToken = function (access) {
     return user.save().then(() => {
         return token;
     });
-}
+};
 
 UserSchema.statics.findByCredentials = (user, loginPassword) => {
     return new Promise((resolve, reject) => {
-        bcrypt.compare(password, user.password, (err, res) => {
-            if (res) {
+        bcrypt.compare(password, user.password, (err, user) => {
+            if (user) {
                 resolve(res);
             } else {
                 reject();
             }
-        })
+        });
     });
-}
+};
 
 var User = mongoose.model('User', UserSchema);
 module.exports = User;

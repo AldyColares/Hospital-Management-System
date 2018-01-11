@@ -2,8 +2,8 @@ let mapAuthorization = new Map();
 
 // every routers with jobs that are authorization
 mapAuthorization
-    .set(registerMedicene, "Pharmacists")
-    .set(consultMedicene, "Pharmacists");
+    .set('registerMedicene', "Pharmacists")
+    .set('consultMedicene', "Pharmacists");
 
 class Authorization {
     constructor(mapAuthorization) {
@@ -14,13 +14,15 @@ class Authorization {
     }
 
     authoUser(req, res) {
-        let access = req.session.tokens[0].access;
-        if (!access) {
+        let session = req.session;
+        console.log(session);
+        if (!session.user) {
             res.status(401);
             req.flash("info", "You must be logged in to see this page.");
             res.redirect("/login");
             return false;
         }
+        var access = session.user.access;
         if (access === 'admin') return true;
         
         var arrayJob = listJobAuthorization.split(' ')
@@ -34,5 +36,6 @@ class Authorization {
         return false;
     };
 }
+var authorization = new Authorization(mapAuthorization);
 
-module.exports = {mapAuthorization, Authorization};
+module.exports = {mapAuthorization, authorization};

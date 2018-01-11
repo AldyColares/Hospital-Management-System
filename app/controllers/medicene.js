@@ -1,18 +1,19 @@
 const validateNewMedicene = require("../models/checkNewDocument/validateNewMedicene")
     , addNewMedicene = require("../models/addNewDocument/addNewMedicene")
-    , authorizationRouter = "registerMedicene"
-    , flashUser = require('../models/flashUser');
+    , flashUser = require('../models/flashUser')
+    , authorizationRouter = "registerMedicene";
 
-var { mapAuthorization, Authorization } = require('../models/safety/authorization')
+var { mapAuthorization, authorization } = require('../models/safety/authorization')
     , controllerRegister = {};
 
-authorization = new Authorization(mapAuthorization);
 authorization.setJobAuthorization(authorizationRouter);
 
 controllerRegister.register = function (req, res, next) {
     flashUser(req, res);
-    var result = authorization.authoUser(req, res);
-    if(!result) return res;
+
+    var isAuthorization = authorization.authoUser(req, res);
+    // if result for false return feedback for user and he redirect from page of login.
+    if(!isAuthorization) return res;
 
     var existDocument = validateNewMedicene(req.body);
     if (existDocument === true) {

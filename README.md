@@ -1,7 +1,10 @@
 Sistema de gerenciamento hospitar.
 
-Caso fictício
+    O projeto será escrito pelo projeto Hospital Management System Project for Final
+Year pelo autor: Sarfaraj Alam, no site www-lovelycoding-org. 
+    Este documento está em fase vesão final. Ainda terá várias anotações que serão 
+inseridos para de orientar sobre o projeto.
 
-Uma nação deseja um sistema único para todos os hospitais serem gerenciados, onde os servidores são admistrados pelo governo. O governo decidiu implementar na maior hopital para validação, comparar os resultados desepenho do uso do MERN(Mongo, Express, React e Node).
+O projeto será escrito stack MERN(Mongo, Express, React e Node).
 
   

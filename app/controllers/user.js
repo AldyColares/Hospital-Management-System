@@ -1,19 +1,19 @@
-const User = require('../models/MongooseODM/user')
-    , flashUser = require('../models/flashUser')
-    , Token = require('../models/MongooseODM/token')
-    , secretCrypt = require('../models/safety/secretCrypt')
-    , generateIdLogin = require('../models/safety/generateIdLogin')
+const User = require('../models/MongooseODM/user'),
+    flashUser = require('../models/flashUser'),
+    Token = require('../models/MongooseODM/token'),
+    secretCrypt = require('../models/safety/secretCrypt'),
+    generateIdLogin = require('../models/safety/generateIdLogin'),
 
-    , nodemailer = require('nodemailer')
-    , _ = require('lodash')
-    , jwt = require('jsonwebtoken');
+    nodemailer = require('nodemailer'),
+    _ = require('lodash'),
+    jwt = require('jsonwebtoken');
 
 userController = {};
 
 userController.login = function (req, res) {
-    flashUser(req, res)
+    flashUser(req, res);
     res.render('login');
-}
+};
 /**
  * POST /login
  * Sign in with email and password
@@ -34,7 +34,8 @@ userController.loginPost = function (req, res, next) {
             // save session the id and access
             let credentialUser = _.pick(user, ['name', 'idLogin']);
             // note dev: I am should going find out a function in the lodash.
-            credentialUser.access = user.tokens;
+            credentialUser.access = user.tokens[0].access;
+            credentialUser.tokens = user.tokens[0].token;
             //console.log("CredentialUser " + credentialUser.name, credentialUser.access);
             req.session.user = credentialUser;
         }).catch((e) => {
@@ -54,7 +55,7 @@ userController.logOut = function (req, res) {
 userController.registerUser = function (req, res) {
     flashUser(req, res);
     res.render('registerUser');
-}
+};
 
 /**
  * POST /registerUserPost
@@ -62,7 +63,6 @@ userController.registerUser = function (req, res) {
 userController.registerUserPost = function (req, res, next) {
     flashUser(req, res);
     // make sure user doesn't comfirm terms
-    console.log("checkboxApplyTermsOfService: " + req.body.checkboxApplyTermsOfService);
 
     if (req.body.checkboxApplyTermsOfService !== "true") {
         return res.status(428).send({ msg: 'the terms of services do not was applay' });
@@ -95,10 +95,10 @@ userController.registerUserPost = function (req, res, next) {
 
             // Save the verification token
             token.save(function (err) {
-                if (err) { return res.status(500).send({ msg: err.message }); }
+                if (err) {
+                    return res.status(500).send({ msg: err.message });
+                }
 
-                res.locals.token = req.flash('token');
-                req.flash('token', token.token);
                 res.render('confirmToken', { token: "/confirmation?token=" + token.token });
 
                 /*
@@ -123,7 +123,6 @@ userController.registerUserPost = function (req, res, next) {
     });
 };
 
-
 userController.confirmationRegisterUser = function (req, res, next) {
 
     // Find a matching token
@@ -139,14 +138,18 @@ userController.confirmationRegisterUser = function (req, res, next) {
             // Verify and save the user
             user.isVerified = true;
             user.idLogin = generateIdLogin(user._id, user.name);
+            res.user = user.idLogin;
             user.save(function (err) {
                 if (err) { return res.status(500).send({ msg: err.message }); }
                 //res.status(200).send("The account has been verified. Please log in.");
             });
+            // The user going redirect for main page.
+
+            res.status(200).redirect('login');
         });
     }
     );
-}
+};
 
 userController.resendTokenPost = function (req, res, next) {
 
