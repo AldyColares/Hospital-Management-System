@@ -13,15 +13,15 @@ var UserSchema = mongoose.Schema({
         unique: true,
         validate: {
             validator:function(v) {
-                return /^[a-zA-Z]+$/.test(v);
+                return true;
+                return /^[A-ZÀ-Ÿ][A-zÀ-ÿ']+\s([A-zÀ-ÿ']\s?)*[A-ZÀ-Ÿ][A-zÀ-ÿ']+$/.test(v);
             },
-            message: '{VALUE} is can not exist number!'
+            message: 'the {VALUE} is can not exist number, especial caracter or empty!',
         }
     },
     password: {
         type: String,
-        require: true,
-        min: 6
+        require: true
     },
     email: {
         type: String,
@@ -31,24 +31,20 @@ var UserSchema = mongoose.Schema({
             validator: function(v){
                 return /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]{2,}$/.test(v);
             },
-            message: '{VALUE} is not email address valide!'
+            message: 'the {VALUE} is not email address valide! user the model exemple@gmail.com'
         }, 
         required: [true, 'User email required']
         
     },
     idLogin: {
-        type: String,
+        type: String
     },
-    tokens: [{
-        access: {
-            type: String,
-            require: true
-        },
-        token: {
-            type: String,
-            require: true
-        }
-    }],
+    role: {
+        type: String
+    },
+    token: {
+        type: String
+    },
     job: {
         type: String,
         require: true
@@ -60,13 +56,9 @@ var UserSchema = mongoose.Schema({
     creatAt: { type: Date, default: Date.now }
 });
 
-UserSchema.pre('save', function(err) {
+UserSchema.pre('save', function(done) {
     // user below is a document object mongoose.
     var user = this;
-    user.validate(function (err) {
-        return done(err);
-    });
-
     //Returns true if this document was modified.
     if (!user.isModified("password")) {
         return done();
@@ -87,11 +79,10 @@ UserSchema.methods.checkPassword = function (guess, done) {
     });
 };
 
-UserSchema.methods.generateAuthToken = function (access) {
-    if (!access) return Promise.reject(new Error("access is undefined"));
+UserSchema.methods.generateAuthToken = function () {
     var user = this;
-    var token = jwt.sign({ _id: user._id.toHexString(), access }, secretCrypt.hashedPassword).toString();
-    user.tokens.push({ access, token });
+    var token = jwt.sign({ _id: user._id.toHexString(), role: user.role }, secretCrypt.hashedPassword).toString();
+    user.token = token;
 
     return user.save().then(() => {
         return token;

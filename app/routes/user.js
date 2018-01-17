@@ -11,4 +11,5 @@ module.exports = function (app) {
 
     app.get('/confirmation', userController.confirmationRegisterUser);
     app.post('/resend', userController.resendTokenPost);
+
 }

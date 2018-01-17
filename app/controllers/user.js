@@ -35,12 +35,11 @@ userController.loginPost = function (req, res, next) {
             res.locals.currentUser = user.name;
 
             // save session the id and access
-            let credentialUser = _.pick(user, ['name', 'idLogin']);
-            // note dev: I am should going find out a function in the lodash.
-            credentialUser.access = user.tokens[0].access;
-            credentialUser.tokens = user.tokens[0].token;
+            let credentialUser = _.pick(user, ['name', 'idLogin', 'role', 'token']);
+            
             //console.log("CredentialUser " + credentialUser.name, credentialUser.access);
             req.session.user = credentialUser;
+            console.log('object session: ' + req.session);
         }).catch((e) => {
             console.error(e.message + '\n' + e.stack);
             res.status(400).send();
@@ -55,9 +54,13 @@ userController.logOut = function (req, res) {
 };
 
 
-userController.registerUser = function (req, res) {
+userController.registerUser = function (req, res, next) {
     flashUser(req, res);
+    var err = new Error('the terms of services do not was applay');
+        err.status = 428;
+       return next(err); 
     res.render('registerUser');
+
 };
 
 /**
@@ -67,38 +70,45 @@ userController.registerUserPost = function (req, res, next) {
     flashUser(req, res);
     // make sure user doesn't comfirm terms
     if (req.body.checkboxApplyTermsOfService !== "true") {
-        return res.status(428).send({ msg: 'the terms of services do not was applay' });
+        
+        var error = new Error('the terms of services do not was applay');
+        error.status = 428;
+        return next(error); 
     }
 
+    console.log("but shoudn't here" + next );
     // Make sure this account doesn't already exist
-    User.findOne({ email: req.body.email }, function (err, user) {
-
+    User.findOne({ email: req.body.email }, function (err, user, next) {
         // Make sure user doesn't already exist
-        if (user) return res.status(400).send({ msg: 'The email address you have entered is already associated with another account.' });
-
+        if (user){ 
+            //return res.status(400).send({ msg: 'The email address you have entered is already associated with another account.' });
+            var error = new Error('The email address you have entered is already associated with another account.');
+            error.status = 400;
+            return next(error);
+             
+        }
+        const body = req.body;
         // Create and save the user
-        user = new User({ name: req.body.name, phone: req.body.phone, email: req.body.email, password: req.body.password });
-      
-        user.save(function (err) {
-            if (err) { return res.status(500).send({ msg: err.message }); }
-            /* 
-             req.flash('info', `the new user ${user.name} registered successful/n 
-                                    the number of Id for login is: ${user.name}.`);
-             res.redirect('/registerUser');
-             */
+        
+        user = new User({ name: body.name, password: body.password, email: body.email, role: body.job, phone: body.phone });
+        
+        user.validate(function (err) {
+            if (err) { return res.status(428).render('428', { msg: err.message }); }
+        });
 
+        user.save(function (next) {
+            console.log("next: " +next);
+            if (err) { return res.status(500).send({ msg: err.message }); }
+            
             var tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
 
-            // Create a verification token for this user
+            // Create a verification token for this user.
             var token = new Token({ _userId: user._id, token: tokenUserId });
 
-            // Save the verification token
+            // Save date base the verification token
             token.save(function (err) {
-                if (err) {
-                    return res.status(500).send({ msg: err.message });
-                }
-
-                res.render('confirmToken', { token: "/confirmation?token=" + token.token });
+                if (err) { return res.status(500).send({ msg: err.message }); }
+                res.status(200).render('confirmToken', { token: "/confirmation?token=" + token.token });
 
                 /*
                 // Send the email
@@ -127,8 +137,10 @@ userController.confirmationRegisterUser = function (req, res, next) {
     // Find a matching token
     Token.findOne({ token: req.query.token }, function (err, token) {
 
-        if (!token) return res.status(400).send({ type: 'not-verified',
-	   msg: 'We were unable to find a valid token. Your token my have expired.' });
+        if (!token) return res.status(400).send({
+            type: 'not-verified',
+            msg: 'We were unable to find a valid token. Your token my have expired.'
+        });
 
         // If we found a token, find a matching user
         User.findOne({ _id: token._userId }, function (err, user) {
@@ -156,8 +168,8 @@ userController.resendTokenPost = function (req, res, next) {
     User.findOne({ email: req.body.email }, function (err, user) {
         if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
         if (user.isVerified) return res.status(400).send({ msg: 'This account has already been verified. Please log in.' });
-	
-	var tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
+
+        var tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
         // Create a verification token, save it, and send email
         var token = new Token({ _userId: user._id, token: tokenUserId });
 
@@ -166,11 +178,15 @@ userController.resendTokenPost = function (req, res, next) {
             if (err) { return res.status(500).send({ msg: err.message }); }
 
             // Send the email
-            var transporter = nodemailer.createTransport({ service: 'Sendgrid', 
-	        auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD } });
-            var mailOptions = { from: 'no-reply@codemoto.io', to: user.email, subject: 'Account Verification Token',
-		 text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + 
-		 req.headers.host + '\/confirmation\/' + token.token + '.\n' };
+            var transporter = nodemailer.createTransport({
+                service: 'Sendgrid',
+                auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD }
+            });
+            var mailOptions = {
+                from: 'no-reply@codemoto.io', to: user.email, subject: 'Account Verification Token',
+                text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' +
+                    req.headers.host + '\/confirmation\/' + token.token + '.\n'
+            };
             transporter.sendMail(mailOptions, function (err) {
                 if (err) { return res.status(500).send({ msg: err.message }); }
                 res.status(200).send('A verification email has been sent to ' + user.email + '.');

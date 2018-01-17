@@ -5,15 +5,20 @@ var express = require('express')
   , flash = require("connect-flash") 
   , session = require("cookie-session")
   
+  , seed = require('../app/util/seed')
   , mongoose = require('./database')
   , home = require('../app/routes/home')
   , medicene = require('../app/routes/medicene')
   , mainPageUser = require('../app/routes/mainPageUser')
-  , login = require('../app/routes/user');
+  , login = require('../app/routes/user')
+  , error = require('../app/routes/handlingError');
+
 
 module.exports = function(){
 var app = express();
     mongoose();
+    // insert documents in the data base.
+    //seed();
     app.use(logger('dev'));
     // configuração de ambiente
     app.set('port', process.env.PORT || 3000);
@@ -40,5 +45,6 @@ var app = express();
     login(app);
     medicene(app);
     home(app);
+    error(app);
     return app;
 }

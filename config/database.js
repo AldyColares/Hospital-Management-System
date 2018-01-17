@@ -14,6 +14,7 @@ const uri = 'mongodb://localhost:27017/HospitalManagementSystem';
 module.exports = function () {
 
     //mongoose.connect('mongodb://localhost:27017/HospitalManagementSystem');
+    mongoose.set('debug', true);
     mongoose.Promise = global.Promise;
     mongoose.connection.openUri(uri);
     

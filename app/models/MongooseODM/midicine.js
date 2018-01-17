@@ -1,8 +1,10 @@
 var mongoose = require('mongoose');
 
 var MedicineSchema = mongoose.Schema({
-    code: { type: String, required: true, unique: true },
+    code: { type: String, required: true },
+    batch: {type: String, required: true, unique: true},
     quantity: { type: Number, required: true },
+    expiration: {type: Date, required: true},
     prize: { type: Number, required: true },
     creatAt: { type: Date, default: Date.now }
 });
