@@ -9,21 +9,19 @@ var options = {
     // If not connected, return errors immediately rather than waiting for reconnect
     bufferMaxEntries: 0
   };
-const uri = 'mongodb://localhost:27017/HospitalManagementSystem'; 
-
+const uriBD = process.env.MONGODB_URI; 
 module.exports = function () {
 
     //mongoose.connect('mongodb://localhost:27017/HospitalManagementSystem');
     mongoose.set('debug', true);
     mongoose.Promise = global.Promise;
-    mongoose.connection.openUri(uri);
-    
+    mongoose.connection.openUri(uriBD);
     mongoose.connection.on('connected', function () {
-        console.log('Mongoose! Conectado em ' + uri);
+        console.log('Mongoose! Conectado em ' + uriBD);
     });
 
     mongoose.connection.on('disconnected', function () {
-        console.log('Mongoose! Desconectado de ' + uri);
+        console.log('Mongoose! Desconectado de ' + uriBD);
     });
 
     mongoose.connection.on('error', function (erro) {

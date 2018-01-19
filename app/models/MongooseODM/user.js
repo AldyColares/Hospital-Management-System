@@ -5,7 +5,6 @@ var mongoose = require('mongoose'),
     jwt = require('jsonwebtoken');
 
 const SALT_FACTOR = 10;
-
 var UserSchema = mongoose.Schema({
     name: {
         type: String,
@@ -14,7 +13,8 @@ var UserSchema = mongoose.Schema({
         validate: {
             validator:function(v) {
                 return true;
-                return /^[A-ZÀ-Ÿ][A-zÀ-ÿ']+\s([A-zÀ-ÿ']\s?)*[A-ZÀ-Ÿ][A-zÀ-ÿ']+$/.test(v);
+                // the Bug of caractere 'ç'.The mongoBD trigger erro if insert that caractere.
+                //return /^[A-ZÀ-Ÿ][A-zÀ-ÿ']+\s([A-zÀ-ÿ']\s?)*[A-ZÀ-Ÿ][A-zÀ-ÿ']+$/.test(v);
             },
             message: 'the {VALUE} is can not exist number, especial caracter or empty!',
         }
@@ -29,9 +29,9 @@ var UserSchema = mongoose.Schema({
         lowercare: true,
         validate: {
             validator: function(v){
-                return /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9]+\.[a-zA-Z0-9]{2,}$/.test(v);
+                return /^[a-z0-9_.+-]+@[a-z0-9]+\.[a-z0-9]{2,}$/.test(v);
             },
-            message: 'the {VALUE} is not email address valide! user the model exemple@gmail.com'
+            message: 'the {VALUE} is not email valide address! Use "exemple@gmail.com" as model.'
         }, 
         required: [true, 'User email required']
         

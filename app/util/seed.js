@@ -1,6 +1,8 @@
-const User = require('../models/MongooseODM/user');
+/*jshint esversion: 6 */
+const User = require('../models/MongooseODM/user'),
+      moongoose = require('mongoose');
 
-module.exports = function() {    
+module.exports = function(next) {    
       User.findOne({idLogin:'jm948d'}, function(err, user){      
       if(!user){
       user = new User({
@@ -13,9 +15,9 @@ module.exports = function() {
                idLogin: 'jm948d',
                phone: '999999999'
              });
-      user.save();
+      user.save(next);
       user.generateAuthToken();
-      console.log("insert admin");
+      console.log("insert acount admin!");
       }
    });
-}
+};

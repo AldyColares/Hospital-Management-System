@@ -1,3 +1,4 @@
+/*jshint esversion: 6 */
 let mapAuthorization = new Map();
 
 // every routers with jobs that are authorization
@@ -25,8 +26,9 @@ class Authorization {
         var access = session.user.access;
         if (access === 'admin') return true;
         
-        var arrayJob = listJobAuthorization.split(' ')
-          , lengthArrayJob = arrayJob.length;
+        var arrayJob = listJobAuthorization.split(' '),
+            lengthArrayJob = arrayJob.length;
+        
         for (var i = 0; i < lengthArrayJob; i++) {
             if(access === arrayJob[i]) return true;
         }
@@ -34,7 +36,7 @@ class Authorization {
         req.flash("info", "you don't authorization!");
         res.render("mainPageUser");
         return false;
-    };
+    }
 }
 var authorization = new Authorization(mapAuthorization);
 

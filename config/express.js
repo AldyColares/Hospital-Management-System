@@ -18,7 +18,7 @@ module.exports = function(){
 var app = express();
     mongoose();
     // insert documents in the data base.
-    //seed();
+    seed();
     app.use(logger('dev'));
     // configuração de ambiente
     app.set('port', process.env.PORT || 3000);

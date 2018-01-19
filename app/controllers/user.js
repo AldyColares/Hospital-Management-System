@@ -4,9 +4,8 @@ const User = require('../models/MongooseODM/user'),
     Token = require('../models/MongooseODM/token'),
     secretCrypt = require('../models/safety/secretCrypt'),
     generateIdLogin = require('../models/safety/generateIdLogin'),
-
     nodemailer = require('nodemailer'),
-    _ = require('lodash'),
+    {pluck} = require('../models/functionUtil/pluck'),
     jwt = require('jsonwebtoken');
 
 userController = {};
@@ -15,7 +14,6 @@ userController.login = function (req, res) {
     flashUser(req, res);
     res.render('login');
 };
-
 
 /**
  * POST /login
@@ -30,14 +28,12 @@ userController.loginPost = function (req, res, next) {
                 ' is not associated with any account.' +
                 'Double-check your email address and try again.'
         });
-
         User.findByCredentials(user, body.password).then((user) => {
             res.locals.currentUser = user.name;
 
             // save session the id and access
             let credentialUser = _.pick(user, ['name', 'idLogin', 'role', 'token']);
-            
-            //console.log("CredentialUser " + credentialUser.name, credentialUser.access);
+
             req.session.user = credentialUser;
             console.log('object session: ' + req.session);
         }).catch((e) => {
@@ -53,12 +49,8 @@ userController.logOut = function (req, res) {
     res.redirect("/");
 };
 
-
 userController.registerUser = function (req, res, next) {
     flashUser(req, res);
-    var err = new Error('the terms of services do not was applay');
-        err.status = 428;
-       return next(err); 
     res.render('registerUser');
 
 };
@@ -70,28 +62,25 @@ userController.registerUserPost = function (req, res, next) {
     flashUser(req, res);
     // make sure user doesn't comfirm terms
     if (req.body.checkboxApplyTermsOfService !== "true") {
-        
         var error = new Error('the terms of services do not was applay');
         error.status = 428;
-        return next(error); 
+        return next(error);
     }
-
-    console.log("but shoudn't here" + next );
     // Make sure this account doesn't already exist
-    User.findOne({ email: req.body.email }, function (err, user, next) {
+    User.findOne({ email: req.body.email }, function (err, user) {
         // Make sure user doesn't already exist
-        if (user){ 
+        if (user){
             //return res.status(400).send({ msg: 'The email address you have entered is already associated with another account.' });
             var error = new Error('The email address you have entered is already associated with another account.');
             error.status = 400;
             return next(error);
-             
+
         }
         const body = req.body;
         // Create and save the user
-        
-        user = new User({ name: body.name, password: body.password, email: body.email, role: body.job, phone: body.phone });
-        
+        var fileUser = pluck(body, 'name', 'password', 'email', 'job', 'phone');
+        user = new User(fileUser);
+
         user.validate(function (err) {
             if (err) { return res.status(428).render('428', { msg: err.message }); }
         });
@@ -99,7 +88,7 @@ userController.registerUserPost = function (req, res, next) {
         user.save(function (next) {
             console.log("next: " +next);
             if (err) { return res.status(500).send({ msg: err.message }); }
-            
+
             var tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
 
             // Create a verification token for this user.
@@ -120,7 +109,7 @@ userController.registerUserPost = function (req, res, next) {
                         user: "al@gmail", // generated ethereal user
                         pass: "account.pass"  // generated ethereal password
                     }
-                });                    
+                });
                 var mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
                 transporter.sendMail(mailOptions, function (err) {
                     if (err) { return res.status(500).send({ msg: err.message }); }
@@ -141,7 +130,6 @@ userController.confirmationRegisterUser = function (req, res, next) {
             type: 'not-verified',
             msg: 'We were unable to find a valid token. Your token my have expired.'
         });
-
         // If we found a token, find a matching user
         User.findOne({ _id: token._userId }, function (err, user) {
             if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
@@ -195,5 +183,4 @@ userController.resendTokenPost = function (req, res, next) {
 
     });
 };
-
 module.exports = userController;
