@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 var mongoose = require('mongoose');
 var npmValidator = require('validator');
-
 var pacientSchema = mongoose.Schema({
     pid: {
         type: String,
@@ -43,16 +42,28 @@ var pacientSchema = mongoose.Schema({
             message: '',
         }
     },
-    pDetailts: {
-        type: String,
+    pDetailts: [{
+        dateAdmited:{
+        type: Date,
         require: true,
         validator: {
             validator: (v) => {
-                return !npmValidator.isEmpty(v);
+                return !npmValidator.isDate(v);
             },
             message: '',
         }
     },
+        dateDischarged: {
+            type: Date,
+            require: true,
+            validator: {
+                validator: (v) => {
+                    return !npmValidator.isDate(v);
+                },
+                message: '',
+            }
+        }
+    }],
     contactNo: {
         type: String,
         require: true,

@@ -4,7 +4,7 @@
   "version": "0.3.5",
   "description": "",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha app/tests/**/*.test.js",
     "start": "nodemon app.js"
   },
   "author": "aldy colares de souza",
@@ -18,20 +18,21 @@
     "crypto-js": "^3.1.9-1",
     "ejs": "^2.5.7",
     "express": "^4.16.1",
-    "express-validator": "^4.3.0",
     "jsonwebtoken": "^8.1.0",
     "lodash": "^4.17.4",
     "mongoose": "^4.13.9",
+    "nanoid": "^1.0.1",
     "nodemailer": "^4.4.1",
     "passport": "^0.4.0",
-    "short-id": "0.1.0-1",
+    "shortid": "^2.2.8",
     "validator": "^9.2.0"
   },
   "devDependencies": {
+    "expect": "^22.1.0",
     "jshint": "^2.9.5",
     "mocha": "^4.1.0",
     "morgan": "^1.9.0",
-    "nodemon": "^1.14.10",
+    "nodemon": "^1.14.11",
     "supertest": "^3.0.0"
   }
 }

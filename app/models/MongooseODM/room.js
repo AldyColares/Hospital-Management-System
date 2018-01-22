@@ -12,7 +12,7 @@ var roomSchema = mongoose.Schema({
             message: 'the room of type do not empty.',
         }
     },
-    //roomId fist field is number, second field is floor hospital. Exemple: 11F2(number 11 of the 
+    //roomId fist field is number, second field is floor hospital. Exemple: 11f2(number 11 of the 
     //second floor).
     roomId: {
         type: String,
@@ -36,6 +36,5 @@ var roomSchema = mongoose.Schema({
         }
     }
 });
-
 var Room = mongoose.model('room', roomSchema);
 module.exports = {Room};

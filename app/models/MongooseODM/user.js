@@ -2,6 +2,7 @@
 var mongoose = require('mongoose'),
     bcrypt = require('bcrypt-nodejs'),
     secretCrypt = require('../safety/secretCrypt'),
+    npmValidator = require('validator'),
     jwt = require('jsonwebtoken');
 
 const SALT_FACTOR = 10;
@@ -12,9 +13,8 @@ var UserSchema = mongoose.Schema({
         unique: true,
         validate: {
             validator:function(v) {
-                return true;
-                // the Bug of caractere 'ç'.The mongoBD trigger erro if insert that caractere.
-                //return /^[A-ZÀ-Ÿ][A-zÀ-ÿ']+\s([A-zÀ-ÿ']\s?)*[A-ZÀ-Ÿ][A-zÀ-ÿ']+$/.test(v);
+                return npmValidator.isAlpha(v, 'pt-BR');
+                
             },
             message: 'the {VALUE} is can not exist number, especial caracter or empty!',
         }
@@ -29,7 +29,7 @@ var UserSchema = mongoose.Schema({
         lowercare: true,
         validate: {
             validator: function(v){
-                return /^[a-z0-9_.+-]+@[a-z0-9]+\.[a-z0-9]{2,}$/.test(v);
+                return npmValidator.isEmail(v);
             },
             message: 'the {VALUE} is not email valide address! Use "exemple@gmail.com" as model.'
         }, 
@@ -57,9 +57,8 @@ var UserSchema = mongoose.Schema({
 });
 
 UserSchema.pre('save', function(done) {
-    // user below is a document object mongoose.
     var user = this;
-    //Returns true if this document was modified.
+    //Returns true if this document was modified in password.
     if (!user.isModified("password")) {
         return done();
     }
@@ -81,7 +80,8 @@ UserSchema.methods.checkPassword = function (guess, done) {
 
 UserSchema.methods.generateAuthToken = function () {
     var user = this;
-    var token = jwt.sign({ _id: user._id.toHexString(), role: user.role }, secretCrypt.hashedPassword).toString();
+    var token = jwt.sign({ _id: user._id.toHexString(), role: user.role },
+                           secretCrypt.hashedPassword).toString();
     user.token = token;
 
     return user.save().then(() => {

@@ -5,7 +5,7 @@ const User = require('../models/MongooseODM/user'),
     secretCrypt = require('../models/safety/secretCrypt'),
     generateIdLogin = require('../models/safety/generateIdLogin'),
     nodemailer = require('nodemailer'),
-    {pluck} = require('../models/functionUtil/pluck'),
+    {pluck} = require('../util/pluck'),
     jwt = require('jsonwebtoken');
 
 userController = {};
