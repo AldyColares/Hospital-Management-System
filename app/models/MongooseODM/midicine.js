@@ -1,5 +1,3 @@
-/*jshint esversion: 6 */
-
 const mongoose = require('mongoose');
 const npmValidator = require('validator');
 
@@ -14,7 +12,7 @@ var MedicineSchema = mongoose.Schema({
       message: 'the {VALUE} can not by empty',
     }
   },
-  // Serial of fabric of the drug.
+  // Serial of fabric of the drug. It should be required fecht for the validity of the remedies.
   batch: {
     type: String,
     required: true,
@@ -31,12 +29,13 @@ var MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        if ((typeof v === 'number') && v > 0) return true;
+        if ((typeof v === 'number') && v > 0) { return true; }
         return false;
       },
       message: 'the {VALUE} can by more zero or decimal number',
     }
   },
+  // the validity of the remedy.
   expiration: {
     type: Date,
     required: true,

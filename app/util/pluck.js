@@ -11,7 +11,7 @@
 
 let pluck = (object, ...keys) => {
   let err;
- 
+
   if (typeof object !== 'object') {
     err = new Error("Error: The first argument passed in must be a object");
     console.error(err.message + "\n" + err.stack);
@@ -31,6 +31,7 @@ let pluck = (object, ...keys) => {
     }
     newObject[key] = object[key]
   });
+  
   return newObject;
 };
 

@@ -1,6 +1,6 @@
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
-var options = {
+let options = {
     useMongoClient: true,
     autoIndex: false, // Don't build indexes
     reconnectTries: Number.MAX_VALUE, // Never stop trying to reconnect
@@ -9,7 +9,9 @@ var options = {
     // If not connected, return errors immediately rather than waiting for reconnect
     bufferMaxEntries: 0
   };
+
 const uriBD = process.env.MONGODB_URI; 
+
 module.exports = function () {
 
     //mongoose.connect('mongodb://localhost:27017/HospitalManagementSystem');
@@ -17,11 +19,11 @@ module.exports = function () {
     mongoose.Promise = global.Promise;
     mongoose.connection.openUri(uriBD);
     mongoose.connection.on('connected', function () {
-        console.log('Mongoose! Conectado em ' + uriBD);
+        console.log('Mongoose! Connect in ' + uriBD);
     });
 
     mongoose.connection.on('disconnected', function () {
-        console.log('Mongoose! Desconectado de ' + uriBD);
+        console.log('Mongoose! Disconnect of ' + uriBD);
     });
 
     mongoose.connection.on('error', function (erro) {
@@ -30,10 +32,9 @@ module.exports = function () {
 
     process.on('SIGINT', function () {
         mongoose.connection.close(function () {
-            console.log('Mongoose! Desconectado pelo término da aplicação');
+            console.log('Mongoose! Disconnect from finish the application.');
         // 0 indica que a finalização ocorreu sem erros
         process.exit(0);
         });
     });
 }
-

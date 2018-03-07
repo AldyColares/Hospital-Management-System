@@ -53,8 +53,7 @@ let UserSchema = mongoose.Schema({
   role: {
     type: String,
     require: true,
-    trim: true
-    
+    trim: true   
   },
   token: {
     type: String,
@@ -65,8 +64,14 @@ let UserSchema = mongoose.Schema({
     type: String,
     require: true
   },
-  phone: { type: String },
-  isVerified: { type: Boolean, default: false },
+  phone: { 
+    type: String,
+    trim: true, 
+  },
+  isVerified: { 
+    type: Boolean, 
+    default: false 
+  },
   passwordResetToken: String,
   passwordResetExpires: Date,
   creatAt: { type: Date, default: Date.now }
@@ -116,6 +121,18 @@ UserSchema.statics.findByCredentials = (user, loginPassword) => {
     });
   });
 };
+
+let handleE11000 = function(error, res, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('There was a duplicate key error'));
+  } else {
+    next();
+  }
+};
+
+UserSchema.post('save', handleE11000);
+UserSchema.post('update', handleE11000);
+UserSchema.post('findOneAndUpdate', handleE11000);
 
 let User = mongoose.model('User', UserSchema);
 module.exports = User;

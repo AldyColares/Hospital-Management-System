@@ -1,5 +1,5 @@
 require('./configDatabase');
-var express = require('express'),
+let express = require('express'),
     logger = require('morgan'),
     bodyParser = require("body-parser"),
     flash = require("connect-flash"),
@@ -8,14 +8,14 @@ var express = require('express'),
     seed = require('../app/util/seed'),
     connectBD = require('./database'),
     home = require('../app/routes/home'),
-    medicene = require('../app/routes/medicene'),
+    medicene = require('../app/routes/medicine'),
     mainPageUser = require('../app/routes/mainPageUser'),
     login = require('../app/routes/user'),
     error = require('../app/routes/handlingError');
 
 
 module.exports = function () {
-    var app = express();
+    let app = express();
     connectBD();
     // insert documents in the data base.
     seed();
@@ -23,13 +23,13 @@ module.exports = function () {
     // configuração de ambiente
     app.set('port', process.env.PORT || 3000);
 
-    const expiryDateInADay = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
+    const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
     app.use(session({
         secret: "TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX",
         name: "sessionId",
         httpOnly: "true",
         segure: "true",
-        maxAge: expiryDateInADay
+        maxAge: EXPIRE_DATE_IN_DAY
 
     }));
 

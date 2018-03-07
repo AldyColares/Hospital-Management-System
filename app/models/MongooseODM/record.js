@@ -29,5 +29,6 @@ let recordSchema = mongoose.Schema({
     require: [true, 'appoinmest is required.']
   }
 });
+
 let Record = mongoose.model('record', recordSchema);
 module.exports = Record;

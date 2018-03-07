@@ -1,4 +1,3 @@
-
 const User = require('../models/MongooseODM/user'),
   flashUser = require('../models/flashUser'),
   Token = require('../models/MongooseODM/token'),

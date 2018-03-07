@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 let mongoose = require('mongoose');
 
 const tokenSchema = new mongoose.Schema({

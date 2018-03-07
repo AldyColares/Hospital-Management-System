@@ -6,6 +6,7 @@ ErrorController.handlingError = function (err, req, res, next) {
   res.status(err.status || 500);
   res.json({
     error: {
+      status: res.status,
       message: err.message
     }
   });

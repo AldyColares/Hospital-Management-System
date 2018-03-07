@@ -1,4 +1,3 @@
-/*jshint esversion: 6 */
 const mongoose = require('mongoose');
 const npmValidator = require('validator');
 let pacientSchema = mongoose.Schema({

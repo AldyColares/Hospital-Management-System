@@ -1,4 +1,3 @@
-
 const mongoose = require('mongoose');
 const npmValidator = require('validator');
 
@@ -41,5 +40,6 @@ let roomSchema = mongoose.Schema({
     }
   }
 });
+
 let Room = mongoose.model('room', roomSchema);
 module.exports = { Room };
