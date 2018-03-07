@@ -1,5 +1,5 @@
-var controller = require("../controllers/home");
-var controllerAbout = require("../controllers/about");
+const controller = require("../controllers/home");
+const controllerAbout = require("../controllers/about");
 
 module.exports = function(app) {
   app.get('/about', controllerAbout.about);

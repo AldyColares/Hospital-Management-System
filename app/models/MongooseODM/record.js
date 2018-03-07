@@ -1,23 +1,33 @@
-var mongoose = require('mongoose');
-var npmValidate = require('validator');
-var recordSchema = mongoose.Schema({
-    patientId: {
-        type: Number,
-        min: [10000, 'patientId indentification invalid.'],
-        
-    },
-    recordNo: {
-        type: Number,
-        min: [10000, 'recordNo indentification invalid.']
-    },
-    discription: {
-        type: String,
-        require: [true, 'discription is required.']
-    },
-    appoinmest: {
-        type: String,
-        require:[true, 'appoinmest is required.']
-    }
+const mongoose = require('mongoose'),
+  npmValidate = require('validator');
+
+let recordSchema = mongoose.Schema({
+  patientId: {
+    type: String,
+    require: true,
+    lowercare: true,
+    trim: true
+  },
+  recordNo: {
+    type: String,
+    require: true,
+    lowercare: true,
+    trim: true
+  },
+  discription: {
+    type: String,
+    require: true,
+    lowercare: true,
+    trim: true,
+    require: [true, 'discription is required.']
+  },
+  appoinmest: {
+    type: String,
+    require: true,
+    lowercare: true,
+    trim: true,
+    require: [true, 'appoinmest is required.']
+  }
 });
-var Record = mongoose.model('record', recordSchema);
+let Record = mongoose.model('record', recordSchema);
 module.exports = Record;
