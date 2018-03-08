@@ -25,7 +25,7 @@ let pacientSchema = mongoose.Schema({
       message: '',
     }
   },
-  sex: {
+  gender: {
     type: String,
     require: true,
     lowercare: true,
@@ -37,6 +37,7 @@ let pacientSchema = mongoose.Schema({
       message: '',
     }
   },
+  // must be city, street and zip
   address: {
     type: String,
     require: true,

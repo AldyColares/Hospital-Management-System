@@ -47,13 +47,13 @@ let UserSchema = mongoose.Schema({
   },
   idLogin: {
     type: String,
-    trim: true, 
+    trim: true,
     unique: true
   },
   role: {
     type: String,
     require: true,
-    trim: true   
+    trim: true
   },
   token: {
     type: String,
@@ -64,13 +64,13 @@ let UserSchema = mongoose.Schema({
     type: String,
     require: true
   },
-  phone: { 
+  phone: {
     type: String,
-    trim: true, 
+    trim: true
   },
-  isVerified: { 
-    type: Boolean, 
-    default: false 
+  isVerified: {
+    type: Boolean,
+    default: false
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
@@ -93,9 +93,13 @@ UserSchema.pre('save', function (done) {
   });
 });
 
-UserSchema.methods.checkPassword = function (guess, done) {
+UserSchema.methods.checkPassword = function (guess, next) {
   bcrypt.compare(guess, this.password, function (err, isMatch) {
-    done(err, isMatch);
+    if (err) { return next(err); }
+    if (isMatch) {
+      return isMatch;
+    }
+    return false;
   });
 };
 
@@ -112,7 +116,7 @@ UserSchema.methods.generateAuthToken = function () {
 
 UserSchema.statics.findByCredentials = (user, loginPassword) => {
   return new Promise((resolve, reject) => {
-    bcrypt.compare(password, user.password, (err, user) => {
+    bcrypt.compare(loginPassword, user.password, (err, user) => {
       if (user) {
         resolve(res);
       } else {
@@ -122,7 +126,7 @@ UserSchema.statics.findByCredentials = (user, loginPassword) => {
   });
 };
 
-let handleE11000 = function(error, res, next) {
+let handleE11000 = function (error, res, next) {
   if (error.name === 'MongoError' && error.code === 11000) {
     next(new Error('There was a duplicate key error'));
   } else {

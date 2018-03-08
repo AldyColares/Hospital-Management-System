@@ -1,11 +1,12 @@
 const mongoose = require('mongoose');
 let npmValidator = require('validator'),
-
+  nameFieldDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
+    'history', 'ContactNumb'],
   employeeSchema = mongoose.Schema({
     EID: {
       type: String,
       require: true,
-      trim: true, 
+      trim: true,
       unique: true,
       validate: {
         validator: (v) => {
@@ -19,7 +20,7 @@ let npmValidator = require('validator'),
       get: v => Math.round(v),
       set: v => Math.round(v),
       min: [5, 'the salary much less.'],
-      max: [7 , 'the salary much high.'],
+      max: [7, 'the salary much high.'],
       validate: {
         validator: (v) => {
           return true;
@@ -35,14 +36,15 @@ let npmValidator = require('validator'),
         }
       }
     },
-    sex: {
+    gender: {
       type: String,
       require: true,
       trim: true,
       validate: {
         validator: (v) => {
-          return true;
-        }
+          return (v === 'male' || v === 'famale');
+        },
+        message: ' the name of field gender must has "male" or "famele".'
       }
     },
     NID: {
@@ -82,12 +84,13 @@ let npmValidator = require('validator'),
       trim: true,
       validate: {
         validator: (v) => {
-          return true;
-        }
+          return npmValidator.isMobilePhone(v, ['en-AU', 'pt-PT']);
+        },
+        message: 'the number phone do not format {VALUE}'
       }
     }
   }
   );
 
 const Employee = mongoose.model('employee', employeeSchema);
-module.exports = { Employee };
+module.exports = { Employee, nameFieldDocuments };

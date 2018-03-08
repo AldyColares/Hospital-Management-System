@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const npmValidator = require('validator');
+const mongoose = require('mongoose'),
+  npmValidator = require('validator');
 
-var MedicineSchema = mongoose.Schema({
+let MedicineSchema = mongoose.Schema({
   code: {
     type: String,
     required: true,
@@ -9,7 +9,7 @@ var MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return;
       },
-      message: 'the {VALUE} can not by empty',
+      message: 'the {VALUE} can not by empty'
     }
   },
   // Serial of fabric of the drug. It should be required fecht for the validity of the remedies.
@@ -21,7 +21,7 @@ var MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return npmValidator.is;
       },
-      message: 'the {VALUE} can not by empty',
+      message: 'the {VALUE} can not by empty'
     }
   },
   quantity: {
@@ -32,7 +32,7 @@ var MedicineSchema = mongoose.Schema({
         if ((typeof v === 'number') && v > 0) { return true; }
         return false;
       },
-      message: 'the {VALUE} can by more zero or decimal number',
+      message: 'the {VALUE} can by more zero or decimal number'
     }
   },
   // the validity of the remedy.
@@ -43,7 +43,7 @@ var MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return true;
       },
-      message: '',
+      message: ''
     }
   },
   prize: {
@@ -53,7 +53,7 @@ var MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return true;
       },
-      message: '',
+      message: ''
     }
   },
   creatAt: {
@@ -63,10 +63,10 @@ var MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return true;
       },
-      message: '',
+      message: ''
     }
   }
 });
 
-var Medicine = mongoose.model("Medicine", MedicineSchema);
+let Medicine = mongoose.model("Medicine", MedicineSchema);
 module.exports = Medicine;

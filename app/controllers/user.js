@@ -27,7 +27,8 @@ userController.loginPost = function (req, res, next) {
         ' is not associated with any account.' +
         'Double-check your email address and try again.'
     });
-    User.findByCredentials(user, body.password).then((user) => {
+    let resultCheckPassword = user.checkPassword(body.password, next);
+    if (resultCheckPassword) {
       res.locals.currentUser = user.name;
 
       // save session the id and access
@@ -35,11 +36,11 @@ userController.loginPost = function (req, res, next) {
 
       req.session.user = credentialUser;
       console.log('object session: ' + req.session);
-    }).catch((e) => {
-      console.error(e.message + '\n' + e.stack);
-      res.status(400).send();
-    });
-    res.status(200).render('mainPageUser');
+
+      res.status(200).render('mainPageUser');
+    }
+    // the response for user will be with React.
+    res.status(400).message('the login or password are wrongs').renser('login');
   });
 };
 
@@ -123,10 +124,13 @@ userController.confirmationRegisterUser = function (req, res, next) {
   // Find a matching token
   Token.findOne({ token: req.query.token }, function (err, token) {
 
-    if (!token) return res.status(400).send({
-      type: 'not-verified',
-      msg: 'We were unable to find a valid token. Your token my have expired.'
-    });
+    if (!token) {
+      return res.status(400).send({
+        type: 'not-verified',
+        msg: 'We were unable to find a valid token. Your token my have expired.'
+      });
+    }
+
     // If we found a token, find a matching user
     User.findOne({ _id: token._userId }, function (err, user) {
       if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
@@ -152,6 +156,7 @@ userController.resendTokenPost = function (req, res, next) {
 
   User.findOne({ email: req.body.email }, function (err, user) {
     if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
+
     if (user.isVerified) return res.status(400).send({
       msg: 'This account has already been' +
         'verified. Please log in.'
@@ -183,4 +188,22 @@ userController.resendTokenPost = function (req, res, next) {
 
   });
 };
+
+userController.updateProfile = function (req, res, next) {
+  const body = req.body,
+    idLoginUser = req.body.idLogin,
+    update = pluck(body, 'birth', 'age', 'gender'),
+    options = { new: true, runValidators: true };
+  delete req.body.idLogin;
+  User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
+    if(err) {
+      err.status = 500;
+      next(err);
+    }
+    console.log(updated);
+    next();
+  });
+};
+
+
 module.exports = userController;

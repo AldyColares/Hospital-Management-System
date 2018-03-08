@@ -24,23 +24,22 @@ let pluck = (object, ...keys) => {
   }
   const newObject = {};
   keys.forEach(key => {
+    newObject[key] = object[key]
     if (!object[key]) {
       err = new Error(`Error: The object passed not have properties ${key} \n ${object}`);
       console.error(err.message + "\n" + err.stack);
-      throw err;
+      delete newObject[key];
     }
-    newObject[key] = object[key]
   });
-  
+
   return newObject;
 };
 
 module.exports = { pluck };
-/*
+
 let test = {};
 
-test.name = 'aldy';
+test.name = 'carlos';
 test.age = 84;
 
 console.log(pluck(test, 'name', 'age', 'address'));
-*/
