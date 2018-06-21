@@ -1,14 +1,16 @@
-let userController = require('../controllers/user');
+import { login, loginPost, logOut, registerUser,
+         registerUserPost, confirmationRegisterUser, 
+         resendTokenPost } from '../controllers/user';
 
-module.exports = function (app) {
-  app.get('/login', userController.login);
-  app.post('/login', userController.loginPost);
+export default function (app) {
+  app.get('/login', login);
+  app.post('/login', loginPost);
 
-  app.get('/logout', userController.logOut);
+  app.get('/logout', logOut);
 
-  app.get('/registerUser', userController.registerUser)
-  app.post('/registerUser', userController.registerUserPost);
+  app.get('/registerUser', registerUser)
+  app.post('/registerUser', registerUserPost);
 
-  app.get('/confirmation', userController.confirmationRegisterUser);
-  app.post('/resend', userController.resendTokenPost);
+  app.get('/confirmation', confirmationRegisterUser);
+  app.post('/resend', resendTokenPost);
 }

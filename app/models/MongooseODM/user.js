@@ -1,6 +1,6 @@
 const mongoose = require('mongoose'),
   bcrypt = require('bcrypt-nodejs'),
-  secretCrypt = require('../safety/secretCrypt'),
+  secretCrypt = require('../safety/secretCrypt').default,
   npmValidator = require('validator'),
   jwt = require('jsonwebtoken');
 

@@ -1,7 +1,7 @@
-const controller = require('../controllers/medicine');
-const { authenticate } = require('../models/safety/authenticate');
+import { registerMedicene, register } from '../controllers/medicine';
+import { authenticate } from '../models/safety/authenticate';
 
-module.exports = function (app) {
-  app.get('/registerMedicene', authenticate, controller.registerMedicene);
-  app.post('/registerMedicene', authenticate, controller.register);
+export default function (app) {
+  app.get('/registerMedicene', authenticate, registerMedicene);
+  app.post('/registerMedicene', authenticate, register);
 }

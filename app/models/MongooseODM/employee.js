@@ -1,7 +1,8 @@
-const mongoose = require('mongoose');
-let npmValidator = require('validator'),
+const mongoose = require('mongoose'),
+  npmValidator = require('validator'),
   nameFieldDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
     'history', 'ContactNumb'],
+
   employeeSchema = mongoose.Schema({
     EID: {
       type: String,

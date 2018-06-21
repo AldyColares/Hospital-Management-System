@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
-const npmValidator = require('validator');
-let pacientSchema = mongoose.Schema({
+import { Schema, model } from 'mongoose';
+import { isEmpty, isDate } from 'validator';
+let pacientSchema = Schema({
   pid: {
     type: String,
     require: true,
@@ -8,7 +8,7 @@ let pacientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: '',
     }
@@ -20,7 +20,7 @@ let pacientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: '',
     }
@@ -32,7 +32,7 @@ let pacientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: '',
     }
@@ -45,7 +45,7 @@ let pacientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: ''
     }
@@ -56,7 +56,7 @@ let pacientSchema = mongoose.Schema({
       require: true,
       validator: {
         validator: (v) => {
-          return !npmValidator.isDate(v);
+          return !isDate(v);
         },
         message: ''
       }
@@ -66,7 +66,7 @@ let pacientSchema = mongoose.Schema({
       require: true,
       validator: {
         validator: (v) => {
-          return !npmValidator.isDate(v);
+          return !isDate(v);
         },
         message: ''
       }
@@ -77,12 +77,12 @@ let pacientSchema = mongoose.Schema({
     require: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: ''
     }
   }
 });
 
-let Pacient = mongoose.model('pacient', pacientSchema);
-module.exports = Pacient;
+let Pacient = model('pacient', pacientSchema);
+export default Pacient;

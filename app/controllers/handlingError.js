@@ -12,4 +12,4 @@ ErrorController.handlingError = function (err, req, res, next) {
   });
 };
 
-module.exports = ErrorController;
+export default ErrorController;

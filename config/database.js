@@ -1,4 +1,4 @@
-let mongoose = require('mongoose');
+import { set, Promise, connection } from 'mongoose';
 
 let options = {
     useMongoClient: true,
@@ -12,26 +12,26 @@ let options = {
 
 const uriBD = process.env.MONGODB_URI; 
 
-module.exports = function () {
+export default function () {
 
     //mongoose.connect('mongodb://localhost:27017/HospitalManagementSystem');
-    mongoose.set('debug', true);
-    mongoose.Promise = global.Promise;
-    mongoose.connection.openUri(uriBD);
-    mongoose.connection.on('connected', function () {
+    set('debug', true);
+    Promise = global.Promise;
+    connection.openUri(uriBD);
+    connection.on('connected', function () {
         console.log('Mongoose! Connect in ' + uriBD);
     });
 
-    mongoose.connection.on('disconnected', function () {
+    connection.on('disconnected', function () {
         console.log('Mongoose! Disconnect of ' + uriBD);
     });
 
-    mongoose.connection.on('error', function (erro) {
+    connection.on('error', function (erro) {
         console.log('Mongoose! Erro na conexão: ' + erro);
     });
 
     process.on('SIGINT', function () {
-        mongoose.connection.close(function () {
+        connection.close(function () {
             console.log('Mongoose! Disconnect from finish the application.');
         // 0 indica que a finalização ocorreu sem erros
         process.exit(0);

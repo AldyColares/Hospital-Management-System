@@ -2,9 +2,9 @@
 
 /**
  * Pluck remove only properties of the object that need and return object them.
- * the first parameter is object e second is a array of name properties
- * @param {object} 
- * @param {array} 
+ * the first parameter is object and second is a array of name properties
+ * @param  {object} 
+ * @param  {array} 
  * @return {object}
  * @public
  */
@@ -35,11 +35,4 @@ let pluck = (object, ...keys) => {
   return newObject;
 };
 
-module.exports = { pluck };
-
-let test = {};
-
-test.name = 'carlos';
-test.age = 84;
-
-console.log(pluck(test, 'name', 'age', 'address'));
+export default pluck ;

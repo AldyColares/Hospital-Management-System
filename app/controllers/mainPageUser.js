@@ -1,4 +1,4 @@
-const flashUser = require('../models/flashUser');
+import flashUser from '../models/flashUser';
 
 let mainPageUser = {};
 mainPageUser.pageUser = function (req, res, next) {
@@ -6,4 +6,4 @@ mainPageUser.pageUser = function (req, res, next) {
   res.render('mainPageUser');
 }
 
-module.exports = mainPageUser;
+export default mainPageUser;

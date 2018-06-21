@@ -1,9 +1,9 @@
 
-const User = require('../models/MongooseODM/user')
+import User, { findOne } from '../models/MongooseODM/user';
 
 // Insert documents of collection for test or es
-module.exports = function (next) {
-  User.findOne({ idLogin: 'jm948d' }, function (err, user) {
+export default function (next) {
+  findOne({ idLogin: 'jm948d' }, function (err, user) {
     if (!user) {
       user = new User({
         name: 'John Max',

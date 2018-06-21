@@ -1,10 +1,10 @@
 /*jshint esversion: 6 */
-require('../../../config/configDatabase');
+import '../../../config/configDatabase';
 
-const expect = require('expect'),
-  conectBD = require('../../../config/database'),
-  mongooose = require('mongoose'),
-  Record = require('../../models/MongooseODM/record');
+import expect from 'expect';
+import conectBD from '../../../config/database';
+import { disconnect } from 'mongoose';
+import Record from '../../models/MongooseODM/record';
 
 conectBD();
 
@@ -20,7 +20,7 @@ describe('Record shema', () => {
         expect(error.errors['recordNo'].message).toBe('recordNo indentification invalid.');
         expect(error.errors['patientId'].message).toBe('patientId indentification invalid.');
 
-        mongooose.disconnect();
+        disconnect();
         done();
       });
     });

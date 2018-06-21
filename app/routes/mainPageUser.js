@@ -1,5 +1,5 @@
-const controllerPageUser = require('../controllers/mainPageUser');
+import { pageUser } from '../controllers/mainPageUser';
 
-module.exports = function(app){
-    app.get('/mainPageUser', controllerPageUser.pageUser);
+export default function(app){
+    app.get('/mainPageUser', pageUser);
 }

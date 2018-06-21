@@ -1,20 +1,19 @@
-require('./configDatabase');
-let express = require('express'),
-    logger = require('morgan'),
-    bodyParser = require("body-parser"),
-    flash = require("connect-flash"),
-    session = require("cookie-session"),
+import './configDatabase';
+import express, { static } from 'express';
+import logger from 'morgan';
+import { urlencoded } from "body-parser";
+import flash from "connect-flash";
+import session from "cookie-session";
+import seed from '../app/util/seed';
+import connectBD from './database';
+import home from '../app/routes/home';
+import medicene from '../app/routes/medicine';
+import mainPageUser from '../app/routes/mainPageUser';
+import login from '../app/routes/user';
+import error from '../app/routes/handlingError';
 
-    seed = require('../app/util/seed'),
-    connectBD = require('./database'),
-    home = require('../app/routes/home'),
-    medicene = require('../app/routes/medicine'),
-    mainPageUser = require('../app/routes/mainPageUser'),
-    login = require('../app/routes/user'),
-    error = require('../app/routes/handlingError');
 
-
-module.exports = function () {
+export default function () {
     let app = express();
     connectBD();
     // insert documents in the data base.
@@ -34,10 +33,10 @@ module.exports = function () {
     }));
 
     app.use(flash());
-    app.use(bodyParser.urlencoded({ extended: false }));
+    app.use(urlencoded({ extended: false }));
 
     // middleware
-    app.use(express.static('./public'));
+    app.use(static('./public'));
     app.set('view engine', 'ejs');
     app.set('views', './app/views');
     //app.set('views', path.resolve(__dirname, "views"));

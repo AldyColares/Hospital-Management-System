@@ -1,5 +1,5 @@
-const handlingErrorController = require('../controllers/handlingError');
+import { handlingError } from '../controllers/handlingError';
 
-module.exports = function (app) {
-  app.use(handlingErrorController.handlingError);
+export default function (app) {
+  app.use(handlingError);
 }

@@ -1,7 +1,7 @@
-const controller = require('../controllers/home'),
-  controllerAbout = require('../controllers/about');
+import { error404 } from '../controllers/home';
+import { about } from '../controllers/about';
 
-module.exports = function (app) {
-  app.get('/about', controllerAbout.about);
-  app.use('*', controller.error404);
+export default function (app) {
+  app.get('/about', about);
+  app.use('*', error404);
 }

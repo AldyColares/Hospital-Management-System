@@ -1,7 +1,7 @@
-const mongoose = require('mongoose');
-const npmValidator = require('validator');
+import { Schema, model } from 'mongoose';
+import { isEmpty } from 'validator';
 
-let roomSchema = mongoose.Schema({
+let roomSchema = Schema({
   roomType: {
     type: String,
     require: true,
@@ -9,7 +9,7 @@ let roomSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: 'the room of type do not empty.',
     }
@@ -24,7 +24,7 @@ let roomSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: 'the room of type do not empty.',
     }
@@ -34,12 +34,12 @@ let roomSchema = mongoose.Schema({
     require: true,
     validator: {
       validator: (v) => {
-        return !npmValidator.isEmpty(v);
+        return !isEmpty(v);
       },
       message: 'the room of type do not empty.',
     }
   }
 });
 
-let Room = mongoose.model('room', roomSchema);
-module.exports = { Room };
+let Room = model('room', roomSchema);
+export default { Room };

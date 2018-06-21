@@ -1,7 +1,7 @@
-const mongoose = require('mongoose'),
-  npmValidator = require('validator');
+import { Schema, model } from 'mongoose';
+import { is } from 'validator';
 
-let MedicineSchema = mongoose.Schema({
+let MedicineSchema = Schema({
   code: {
     type: String,
     required: true,
@@ -19,7 +19,7 @@ let MedicineSchema = mongoose.Schema({
     unique: true,
     validate: {
       validator: (v) => {
-        return npmValidator.is;
+        return is;
       },
       message: 'the {VALUE} can not by empty'
     }
@@ -68,5 +68,5 @@ let MedicineSchema = mongoose.Schema({
   }
 });
 
-let Medicine = mongoose.model("Medicine", MedicineSchema);
-module.exports = Medicine;
+let Medicine = model("Medicine", MedicineSchema);
+export default Medicine;

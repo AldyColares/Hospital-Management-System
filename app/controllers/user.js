@@ -1,11 +1,11 @@
-const User = require('../models/MongooseODM/user'),
-  flashUser = require('../models/flashUser'),
-  Token = require('../models/MongooseODM/token'),
-  secretCrypt = require('../models/safety/secretCrypt'),
-  generateIdLogin = require('../models/safety/generateIdLogin'),
-  nodemailer = require('nodemailer'),
-  { pluck } = require('../util/pluck'),
-  jwt = require('jsonwebtoken');
+import User, { findOne, findOneAndUpdate } from '../models/MongooseODM/user';
+import flashUser from '../models/flashUser';
+import Token, { findOne as _findOne } from '../models/MongooseODM/token';
+import { hashedPassword } from '../models/safety/secretCrypt';
+import generateIdLogin from '../models/safety/generateIdLogin';
+import { createTransport } from 'nodemailer';
+import pluck from '../util/pluck';
+import { sign } from 'jsonwebtoken';
 
 let userController = {};
 
@@ -21,7 +21,7 @@ userController.login = function (req, res) {
 userController.loginPost = function (req, res, next) {
   let body = req.body;
   flashUser(req, res);
-  User.findOne({ name: body.name }, function (err, user) {
+  findOne({ name: body.name }, function (err, user) {
     if (!user) return res.status(401).send({
       msg: 'The email address ' + req.body.email +
         ' is not associated with any account.' +
@@ -66,7 +66,7 @@ userController.registerUserPost = function (req, res, next) {
     return next(error);
   }
   // Make sure this account doesn't already exist
-  User.findOne({ email: req.body.email }, function (err, user) {
+  findOne({ email: req.body.email }, function (err, user) {
     // Make sure user doesn't already exist
     if (user) {
       let error = new Error('The email address you have entered is already associated' +
@@ -76,25 +76,35 @@ userController.registerUserPost = function (req, res, next) {
     }
 
     const body = req.body;
+    Object.freeze(body);
     // Create model objec and save the user.
     let fileUser = pluck(body, 'name', 'password', 'email', 'job', 'phone');
     user = new User(fileUser);
 
     user.validate(function (err) {
-      if (err) { return res.status(428).render('428', { msg: err.message }); }
+      if (err) { // old version: { return res.status(428).render('428', { msg: err.message }); }
+        let error = new Error('err.message');
+        error.status = 428;
+        return next(error);
+      }
     });
 
-    user.save(function (next) {
+    user.save(function (err) {
       if (err) { return res.status(500).send({ msg: err.message }); }
 
-      let tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
+      let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
 
       // Create a verification token for this user.
       let token = new Token({ _userId: user._id, token: tokenUserId });
 
       // Save date base the verification token
       token.save(function (err) {
-        if (err) { return res.status(500).send({ msg: err.message }); }
+        if (err) { // old version: { return res.status(500).send({ msg: err.message }); }
+          let error = new Error(err.message);
+          error.status = 500;
+          return next(error);
+        }
+
         res.status(200).render('confirmToken', { token: '/confirmation?token=' + token.token });
 
         /*
@@ -110,7 +120,11 @@ userController.registerUserPost = function (req, res, next) {
         });
         let mailOptions = { from: 'no-reply@yourwebapplication.com', to: user.email, subject: 'Account Verification Token', text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/' + token.token + '.\n' };
         transporter.sendMail(mailOptions, function (err) {
-            if (err) { return res.status(500).send({ msg: err.message }); }
+            if (err) { // return res.status(500).send({ msg: err.message }); }
+              let error = new Error(err.message);
+              error.status = 500;
+              return next(error);
+        }
             res.status(200).send('A verification email has been sent to ' + user.email + '.');
         });
         */
@@ -122,7 +136,7 @@ userController.registerUserPost = function (req, res, next) {
 userController.confirmationRegisterUser = function (req, res, next) {
 
   // Find a matching token
-  Token.findOne({ token: req.query.token }, function (err, token) {
+  _findOne({ token: req.query.token }, function (err, token) {
 
     if (!token) {
       return res.status(400).send({
@@ -132,7 +146,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
     }
 
     // If we found a token, find a matching user
-    User.findOne({ _id: token._userId }, function (err, user) {
+    findOne({ _id: token._userId }, function (err, user) {
       if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
       if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
 
@@ -154,7 +168,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
 userController.resendTokenPost = function (req, res, next) {
 
-  User.findOne({ email: req.body.email }, function (err, user) {
+  findOne({ email: req.body.email }, function (err, user) {
     if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
 
     if (user.isVerified) return res.status(400).send({
@@ -162,7 +176,7 @@ userController.resendTokenPost = function (req, res, next) {
         'verified. Please log in.'
     });
 
-    let tokenUserId = jwt.sign({ _id: user._id.toHexString() }, secretCrypt.hashedPassword);
+    let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
     // Create a verification token, save it, and send email
     let token = new Token({ _userId: user._id, token: tokenUserId });
 
@@ -171,7 +185,7 @@ userController.resendTokenPost = function (req, res, next) {
       if (err) { return res.status(500).send({ msg: err.message }); }
 
       // Send the email
-      let transporter = nodemailer.createTransport({
+      let transporter = createTransport({
         service: 'Sendgrid',
         //auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD }
       });
@@ -195,8 +209,8 @@ userController.updateProfile = function (req, res, next) {
     update = pluck(body, 'birth', 'age', 'gender'),
     options = { new: true, runValidators: true };
   delete req.body.idLogin;
-  User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
-    if(err) {
+  findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
+    if (err) {
       err.status = 500;
       next(err);
     }
@@ -205,5 +219,4 @@ userController.updateProfile = function (req, res, next) {
   });
 };
 
-
-module.exports = userController;
+export default userController;
