@@ -1,13 +1,18 @@
 Sistema de gerenciamento hospitar.
 
-    O sistema será escrito com o nome Hospital Management System Project for Final
-Year pelo autor: Sarfaraj Alam, no site www-lovelycoding-org. 
-    Este documento está inacabado. Ainda terá várias anotações que serão 
-inseridos para orientar o uso do sistema.
 
-O projeto será escrito com as tecnologias stack MERN(Mongo, Express, React e Node).
+O projeto será escrito com as tecnologias stack MERN(Mongo, Express, React e No-
+de), API REST, testes automaticos com Mork etc.
 
-O projeto é fictício que oferecer serviços para hospitais de uma provincia. Fora estimado 
-que a somatória das requisições sejam mais de 20 mil requisições por segundo. 
+O projeto oferece serviços de rotinas dos hospitais. Por exemplo, registro de 
+paciente, laudo médico, receita médica, pagamento dos serviços médicos, resulta-
+do de exames,  etc.
 
+O projeto foi baseado em caso do site: 
+https://www.lovelycoding.org/2015/10/hospital-management-system-php-java-project.html. 
+Vou inserir algumas novas funcionalidades que o autor deste projeto, contido no
+site, não inseriu. Ainda vão ser detalhado neste documento estas novas funciona-
+lidades.
+
+Este documento ainda não está finalizado..
   
