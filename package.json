@@ -1,7 +1,7 @@
 {
   "name": "hospital",
   "private": true,
-  "version": "0.4.5",
+  "version": "0.4.9",
   "description": "",
   "scripts": {
     "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha app/tests/**/*.test.js",
@@ -24,16 +24,11 @@
     "nodemailer": "^4.4.1",
     "passport": "^0.4.0",
     "shortid": "^2.2.8",
-    "validator": "^9.2.0"
+    "validator": "^10.4.0"
   },
   "devDependencies": {
-    "eslint": "^4.17.0",
-    "eslint-config-airbnb": "^16.1.0",
-    "eslint-plugin-import": "^2.8.0",
-    "eslint-plugin-jsx-a11y": "^6.0.3",
-    "eslint-plugin-react": "^7.6.1",
-    "expect": "^22.1.0",
-    "mocha": "^4.1.0",
+    "expect": "^23.1.0",
+    "mocha": "^5.2.0",
     "morgan": "^1.9.0",
     "nodemon": "^1.14.11",
     "supertest": "^3.0.0"

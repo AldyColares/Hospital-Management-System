@@ -1,4 +1,3 @@
-
 import User, { findOne } from '../models/MongooseODM/user';
 
 // Insert documents of collection for test or es

@@ -1,10 +1,9 @@
-
 // the model for test login.
-var request = require('supertest'),
-  should = require('should'),
-  app = require('../server');
+import request from 'supertest';
+import expect from 'expect';
+import app from '../server';
 
-var Cookies;
+let Cookies, body;
 
 describe('Functional Test <Sessions>:', function () {
 
@@ -16,9 +15,10 @@ describe('Functional Test <Sessions>:', function () {
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
-        res.body.id.should.equal('1');
-        res.body.short_name.should.equal('Test user');
-        res.body.email.should.equal('user_test@example.com');
+        body = res.body;
+        expect(body.id).toEqual('1',["nonono"]);
+        expect(body.name).toEqual('user', ["onononon"]);
+        expect(body.email).toEqual('exemple@gmail.com',['messagem email']);
         // Save the cookie to use it later to retrieve the session
         Cookies = res.headers['set-cookie'].pop().split(';')[0];
         done();
@@ -26,16 +26,18 @@ describe('Functional Test <Sessions>:', function () {
   });
 
   it('should get user session for current user', function (done) {
-    var req = request(app).get('/v1/sessions');
+    let req = request(app).get('/v1/sessions');
     // Set cookie to get saved user session
     req.cookies = Cookies;
     req.set('Accept', 'application/json')
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
-        res.body.id.should.equal('1');
-        res.body.short_name.should.equal('Test user');
-        res.body.email.should.equal('user_test@example.com');
+        expect(body.id).toBeA('1');
+        expect()
+        body.id.should.equal('1');
+        body.short_name.should.equal('Test user');
+        body.email.should.equal('user_test@example.com');
         done();
       });
   });
