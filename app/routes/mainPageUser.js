@@ -1,5 +1,5 @@
 import { pageUser } from '../controllers/mainPageUser';
 
 export default function(app){
-    app.get('/mainPageUser', pageUser);
+    app.get('/main-mage-user', pageUser);
 }

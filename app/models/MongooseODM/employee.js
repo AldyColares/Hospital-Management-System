@@ -4,6 +4,7 @@ const mongoose = require('mongoose'),
     'history', 'ContactNumb'],
 
   employeeSchema = mongoose.Schema({
+    // Employee Identification
     EID: {
       type: String,
       require: true,
@@ -11,9 +12,10 @@ const mongoose = require('mongoose'),
       unique: true,
       validate: {
         validator: (v) => {
-          return true;
+          return npmValidator.isAlphanumeric;
         }
-      }
+      },
+      message: 'ID of Employer must be Alphanumeric'
     },
     Salary: {
       type: Number,
@@ -24,9 +26,10 @@ const mongoose = require('mongoose'),
       max: [7, 'the salary much high.'],
       validate: {
         validator: (v) => {
-          return true;
+          return typeof v === 'number';
         }
-      }
+      },
+      message: 'the salary {VALUE} must be number'
     },
     EAddress: {
       type: String,

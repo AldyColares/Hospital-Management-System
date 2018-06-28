@@ -1,7 +1,6 @@
 import { registerMedicene, register } from '../controllers/medicine';
-import { authenticate } from '../models/safety/authenticate';
 
 export default function (app) {
-  app.get('/registerMedicene', authenticate, registerMedicene);
-  app.post('/registerMedicene', authenticate, register);
+  app.get('/register-medicene',  registerMedicene);
+  app.post('/register-medicene', register);
 }

@@ -3,12 +3,19 @@ import flashUser from '../models/flashUser';
 import Token, { findOne as _findOne } from '../models/MongooseODM/token';
 import { hashedPassword } from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
-import sendEmailVericationUser from '../models/centralInformationModel'
-import { createTransport } from 'nodemailer';
+import sendEmailVericationUser from '../models/centralInformationModel';
+import errorMiddleware from '../models/errorMiddleware';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
 
-let userController = {};
+let userController = {},
+  env = process.env.NODE_ENV || 'development';
+;
+
+/*
+ * GET /login
+ * Just for render of page login and in the future identification Token.
+ */
 
 userController.login = function (req, res) {
   flashUser(req, res);
@@ -38,7 +45,7 @@ userController.loginPost = function (req, res, next) {
       req.session.user = credentialUser;
       console.log('object session: ' + req.session);
 
-      res.status(200).render('mainPageUser');
+      res.status(200).render('main-page-user');
     }
     // the response for user will be with React.
     res.status(400).message('the login or password are wrongs').renser('login');
@@ -52,42 +59,35 @@ userController.logOut = function (req, res) {
 
 userController.registerUser = function (req, res, next) {
   flashUser(req, res);
-  res.render('registerUser');
+  res.render('register-user');
 };
 
 /*
  * POST /registerUserPost
+ * Register new user.
  */
 userController.registerUserPost = function (req, res, next) {
   flashUser(req, res);
   // make sure user doesn't confirm terms
   if (req.body.checkboxApplyTermsOfService !== 'true') {
-    let error = new Error('the terms of services do not was applay');
-    error.status = 428;
-    return next(error);
+    if (err) errorMiddleware('the terms of services do not was applay', 428, next);
   }
   // Make sure this account doesn't already exist
   findOne({ email: req.body.email }, function (err, user) {
+    if (err) errorMiddleware(err.message, 500, next);
+
     // Make sure user doesn't already exist
-    if (user) {
-      let error = new Error('The email address you have entered is already associated' +
-        'with another account.');
-      error.status = 400;
-      return next(error);
-    }
+    if (user) errorMiddleware('The email address you have entered is already associated' +
+      'with another account.', 400, next);
 
     const body = req.body;
     Object.freeze(body);
-    // Create model objec and save the user.
+    // Create model object and save the user.
     let fileUser = pluck(body, 'name', 'password', 'email', 'job', 'phone');
     user = new User(fileUser);
 
     user.validate(function (err) {
-      if (err) { // old version: { return res.status(428).render('428', { msg: err.message }); }
-        let error = new Error('err.message');
-        error.status = 428;
-        return next(error);
-      }
+      if (err) errorMiddleware(err.message, 428, next);
     });
 
     user.save(function (err) {
@@ -98,25 +98,48 @@ userController.registerUserPost = function (req, res, next) {
       // Create a verification token for this user.
       let token = new Token({ _userId: user._id, token: tokenUserId });
 
-      // Save date base the verification token
+      // Save date base of the verification token.
       token.save(function (err) {
-        if (err) { // old version: { return res.status(500).send({ msg: err.message }); }
-          let error = new Error(err.message);
-          error.status = 500;
-          return next(error);
-        }
+        if (err) errorMiddleware(err.message, 500, next);
 
-        res.status(200).render('confirmToken', { token: '/confirmation?token=' + token.token });
-        sendEmailVericationUser(res, next);
+        // note: I still can not test with verication send email. 
+        if (env !== 'test') {
+          const setupSendEmail = {},
+            emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
+              +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
+              + token.token + '.\n';
+
+          setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
+            setup.mailOptions.to + '.';
+
+          setupSendEmail.mailOptions = {
+            from: 'no-reply@yourwebapplication.com',
+            to: user.email,
+            subject: 'Account Verification Token',
+            text: emailText
+          };
+
+          setupSendEmail.res = res;
+          setupSendEmail.next = next;
+          sendEmailVericationUser(setupSendEmail);
+          user.isVerified = true;
+        } else {
+          res.status(200).render('confirmToken', { token: '/confirmation?token=' + token.token });
+        }
       });
     });
   });
 };
 
+/*
+ * Confirmation if the user exists through in the email.
+ *  
+ */
 userController.confirmationRegisterUser = function (req, res, next) {
 
   // Find a matching token
   _findOne({ token: req.query.token }, function (err, token) {
+    if (err) errorMiddleware(err.message, 500, next);
 
     if (!token) {
       return res.status(400).send({
@@ -164,20 +187,20 @@ userController.resendTokenPost = function (req, res, next) {
     token.save(function (err) {
       if (err) { return res.status(500).send({ msg: err.message }); }
 
-      // Send the email
-      let transporter = createTransport({
-        service: 'Sendgrid',
-        //auth: { user: process.env.SENDGRID_USERNAME, pass: process.env.SENDGRID_PASSWORD }
-      });
-      let mailOptions = {
-        from: 'no-reply@codemoto.io', to: user.email, subject: 'Account Verification Token',
-        text: 'Hello,\n\n' + 'Please verify your account by clicking the link: \nhttp:\/\/' +
-          req.headers.host + '\/confirmation\/' + token.token + '.\n'
+      let emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
+        +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
+        + token.token + '.\n';
+      setupSendEmail.mailOptions = {
+        from: 'no-reply@yourwebapplication.com',
+        to: user.email,
+        subject: 'Account Verification Token',
+        text: emailText
       };
-      transp orter.sendMail(mailOptions, function (err) {
-        if (err) { return res.status(500).send({ msg: err.message }); }
-        res.status(200).send('A verification email has been sent to ' + user.email + '.');
-      });
+      setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
+        user.email + '.';
+      setupSendEmail.res = res;
+      setupSendEmail.next = next;
+      sendEmailVericationUser(setupSendEmail);
     });
 
   });

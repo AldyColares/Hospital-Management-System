@@ -1,21 +1,15 @@
 import flashUser from '../models/flashUser';
 import Medicine, { findOne } from '../MongooseODM/midicine';
 import pluck from '../util/pluck';
-const authorizationRouter = 'registerMedicene';
 
-import { setJobAuthorization, authoUser } from '../models/safety/authorization';
+const controllerRegister = {};
 
-let controllerRegister = {};
-
-setJobAuthorization(authorizationRouter);
 
 controllerRegister.register = function (req, res, next) {
   flashUser(req, res);
   const body = req.body;
-  let isAuthorization = authoUser(req, res);
-  // if result for false return feedback for user and he will redirect from page of login.
-  if (!isAuthorization) { return res; }
-
+  Object.freeze(body);
+  
   findOne({ code: code }, function (err, foundMedicine) {
     if (err) {
       err.status = 503;
@@ -36,12 +30,9 @@ controllerRegister.register = function (req, res, next) {
 
   controllerRegister.registerMedicene = function (req, res) {
     flashUser(req, res);
-    let result = authoUser(req, res);
-    if (!result) {
-      return res;
-    }
+
     return res.render('registerMedicene');
   };
 }
 
-export default { controllerRegister };
+export default  controllerRegister ;

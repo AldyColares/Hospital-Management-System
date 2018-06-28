@@ -8,9 +8,9 @@ export default function (app) {
 
   app.get('/logout', logOut);
 
-  app.get('/registerUser', registerUser)
-  app.post('/registerUser', registerUserPost);
+  app.get('/register-user', registerUser)
+  app.post('/register-user', registerUserPost);
 
-  app.get('/confirmation', confirmationRegisterUser);
+  app.get('/confirmation-register-user', confirmationRegisterUser);
   app.post('/resend', resendTokenPost);
 }

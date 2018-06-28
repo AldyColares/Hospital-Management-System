@@ -1,7 +1,7 @@
 {
   "name": "hospital",
   "private": true,
-  "version": "0.4.9",
+  "version": "0.4.5",
   "description": "",
   "scripts": {
     "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha app/tests/**/*.test.js",
@@ -21,7 +21,7 @@
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^5.0.9",
     "nanoid": "^1.0.1",
-    "nodemailer": "^4.4.1",
+    "nodemailer": "^4.6.7",
     "passport": "^0.4.0",
     "shortid": "^2.2.8",
     "validator": "^10.4.0"

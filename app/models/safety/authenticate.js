@@ -9,4 +9,4 @@ let authenticate = (req, res, next) => {
   }
   next();
 };
-export default  authenticate ;
+export default  authenticate;
