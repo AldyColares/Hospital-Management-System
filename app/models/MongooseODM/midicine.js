@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose';
-import { is } from 'validator';
+import mongoose from 'mongoose';
+import validator from 'validator';
 
-let MedicineSchema = Schema({
+let MedicineSchema = mongoose.Schema({
   code: {
     type: String,
     required: true,
@@ -19,7 +19,7 @@ let MedicineSchema = Schema({
     unique: true,
     validate: {
       validator: (v) => {
-        return is;
+        return validator.isAlphanumeric(v);
       },
       message: 'the {VALUE} can not by empty'
     }
@@ -29,7 +29,7 @@ let MedicineSchema = Schema({
     required: true,
     validate: {
       validator: (v) => {
-        if ((typeof v === 'number') && v > 0) { return true; }
+        if (validator.isAlphanumeric(v) && v > 0) { return true; }
         return false;
       },
       message: 'the {VALUE} can by more zero or decimal number'
@@ -68,5 +68,5 @@ let MedicineSchema = Schema({
   }
 });
 
-let Medicine = model("Medicine", MedicineSchema);
+let Medicine = mongoose.model("Medicine", MedicineSchema);
 export default Medicine;

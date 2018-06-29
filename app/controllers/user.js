@@ -1,12 +1,13 @@
-import User, { findOne, findOneAndUpdate } from '../models/MongooseODM/user';
+import User from '../models/MongooseODM/user';
 import flashUser from '../models/flashUser';
-import Token, { findOne as _findOne } from '../models/MongooseODM/token';
-import { hashedPassword } from '../models/safety/secretCrypt';
+import Token from '../models/MongooseODM/token';
+import  hashedPassword  from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../models/errorMiddleware';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
+
 
 let userController = {},
   env = process.env.NODE_ENV || 'development';
@@ -29,7 +30,7 @@ userController.login = function (req, res) {
 userController.loginPost = function (req, res, next) {
   let body = req.body;
   flashUser(req, res);
-  findOne({ name: body.name }, function (err, user) {
+  User.findOne({ name: body.name }, function (err, user) {
     if (!user) return res.status(401).send({
       msg: 'The email address ' + req.body.email +
         ' is not associated with any account.' +
@@ -48,7 +49,7 @@ userController.loginPost = function (req, res, next) {
       res.status(200).render('main-page-user');
     }
     // the response for user will be with React.
-    res.status(400).message('the login or password are wrongs').renser('login');
+    res.status(400).message('the login or password are wrongs').render('login');
   });
 };
 
@@ -73,7 +74,7 @@ userController.registerUserPost = function (req, res, next) {
     if (err) errorMiddleware('the terms of services do not was applay', 428, next);
   }
   // Make sure this account doesn't already exist
-  findOne({ email: req.body.email }, function (err, user) {
+  User.findOne({ email: req.body.email }, function (err, user) {
     if (err) errorMiddleware(err.message, 500, next);
 
     // Make sure user doesn't already exist
@@ -138,7 +139,7 @@ userController.registerUserPost = function (req, res, next) {
 userController.confirmationRegisterUser = function (req, res, next) {
 
   // Find a matching token
-  _findOne({ token: req.query.token }, function (err, token) {
+  Token.findOne({ token: req.query.token }, function (err, token) {
     if (err) errorMiddleware(err.message, 500, next);
 
     if (!token) {
@@ -149,9 +150,16 @@ userController.confirmationRegisterUser = function (req, res, next) {
     }
 
     // If we found a token, find a matching user
-    findOne({ _id: token._userId }, function (err, user) {
-      if (!user) return res.status(400).send({ msg: 'We were unable to find a user for this token.' });
-      if (user.isVerified) return res.status(400).send({ type: 'already-verified', msg: 'This user has already been verified.' });
+    Token.findOne({ _id: token._userId }, function (err, user) {
+      if (!user) return res.status(400).send(
+        { msg: 'We were unable to find a user for this token.' }
+      );
+      
+      if (user.isVerified) return res.status(400).send(
+        { 
+          type: 'already-verified', 
+          msg: 'This user has already been verified.' 
+        });
 
       // Verify and save the user
       user.isVerified = true;
@@ -171,7 +179,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
 userController.resendTokenPost = function (req, res, next) {
 
-  findOne({ email: req.body.email }, function (err, user) {
+  User.findOne({ email: req.body.email }, function (err, user) {
     if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
 
     if (user.isVerified) return res.status(400).send({
@@ -212,7 +220,7 @@ userController.updateProfile = function (req, res, next) {
     update = pluck(body, 'birth', 'age', 'gender'),
     options = { new: true, runValidators: true };
   delete req.body.idLogin;
-  findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
+  User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
     if (err) {
       err.status = 500;
       next(err);

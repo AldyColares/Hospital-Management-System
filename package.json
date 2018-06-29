@@ -5,7 +5,7 @@
   "description": "",
   "scripts": {
     "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha app/tests/**/*.test.js",
-    "start": "nodemon app.js"
+    "start": "nodemon -r esm app.js"
   },
   "author": "aldy colares de souza",
   "license": "ISC",
@@ -17,7 +17,8 @@
     "cookie-session": "^2.0.0-beta.3",
     "crypto-js": "^3.1.9-1",
     "ejs": "^2.5.7",
-    "express": "^4.16.1",
+    "esm": "^3.0.55",
+    "express": "^4.16.3",
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^5.0.9",
     "nanoid": "^1.0.1",

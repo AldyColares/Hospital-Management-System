@@ -1,16 +1,14 @@
-import { login, loginPost, logOut, registerUser,
-         registerUserPost, confirmationRegisterUser, 
-         resendTokenPost } from '../controllers/user';
+import  user  from '../controllers/user';
 
 export default function (app) {
-  app.get('/login', login);
-  app.post('/login', loginPost);
+  app.get('/login', user.login);
+  app.post('/login', user.loginPost);
 
-  app.get('/logout', logOut);
+  app.get('/logout', user.logOut);
 
-  app.get('/register-user', registerUser)
-  app.post('/register-user', registerUserPost);
+  app.get('/register-user', user.registerUser)
+  app.post('/register-user', user.registerUserPost);
 
-  app.get('/confirmation-register-user', confirmationRegisterUser);
-  app.post('/resend', resendTokenPost);
+  app.get('/confirmation-register-user', user.confirmationRegisterUser);
+  app.post('/resend', user.resendTokenPost);
 }

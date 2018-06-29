@@ -1,5 +1,6 @@
-import './configDatabase';
-import express, { static } from 'express';
+
+import configDatabase from './configDatabase';
+import express from 'express';
 import logger from 'morgan';
 import { urlencoded } from "body-parser";
 import flash from "connect-flash";
@@ -13,8 +14,11 @@ import login from '../app/routes/user';
 import error from '../app/routes/handlingError';
 
 
-export default function () {
+
+export default (function () {
     let app = express();
+    configDatabase;
+    
     connectBD();
     // insert documents in the data base.
     seed();
@@ -31,19 +35,18 @@ export default function () {
         maxAge: EXPIRE_DATE_IN_DAY
 
     }));
-
+    
     app.use(flash());
     app.use(urlencoded({ extended: false }));
-
+    
     // middleware
-    app.use(static('./public'));
+    app.use(express.static('./public'));
     app.set('view engine', 'ejs');
     app.set('views', './app/views');
-    //app.set('views', path.resolve(__dirname, "views"));
     mainPageUser(app);
     login(app);
     medicene(app);
     home(app);
     error(app);
     return app;
-}
+})();

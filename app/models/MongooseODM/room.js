@@ -1,7 +1,7 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
 import { isEmpty } from 'validator';
 
-let roomSchema = Schema({
+let roomSchema = mongoose.Schema({
   roomType: {
     type: String,
     require: true,
@@ -41,5 +41,5 @@ let roomSchema = Schema({
   }
 });
 
-let Room = model('room', roomSchema);
+let Room = mongose.model('room', roomSchema);
 export default { Room };

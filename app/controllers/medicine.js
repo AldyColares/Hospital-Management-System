@@ -1,16 +1,17 @@
 import flashUser from '../models/flashUser';
-import Medicine, { findOne } from '../MongooseODM/midicine';
+import Medicine from '../models/MongooseODM/midicine';
+import mongoose from 'mongoose';
 import pluck from '../util/pluck';
 
-const controllerRegister = {};
+let controllerRegister = {};
 
 
 controllerRegister.register = function (req, res, next) {
   flashUser(req, res);
   const body = req.body;
   Object.freeze(body);
-  
-  findOne({ code: code }, function (err, foundMedicine) {
+
+  mongoose.findOne({ code: code }, function (err, foundMedicine) {
     if (err) {
       err.status = 503;
       return next(err);
@@ -27,12 +28,13 @@ controllerRegister.register = function (req, res, next) {
     req.flash('info', `The of code medicene: ${req.body.code} registered successful`);
     return res.redirect('/registerMedicene');
   });
-
-  controllerRegister.registerMedicene = function (req, res) {
-    flashUser(req, res);
-
-    return res.render('registerMedicene');
-  };
 }
 
-export default  controllerRegister ;
+controllerRegister.registerMedicene = function (req, res) {
+  flashUser(req, res);
+
+  return res.render('registerMedicene');
+};
+
+
+export default controllerRegister;

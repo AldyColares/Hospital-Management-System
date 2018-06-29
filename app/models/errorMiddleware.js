@@ -8,7 +8,8 @@
  */
 
 let errorMiddleware = (message, status, next) => {
-    let error = new Error(message);
+    let error = new Error();
+    error.message = message;
     error.status = status;
     return next(error);
 }

@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
 import { isEmpty, isDate } from 'validator';
-let pacientSchema = Schema({
+let pacientSchema = mongoose.Schema({
   pid: {
     type: String,
     require: true,
@@ -84,5 +84,5 @@ let pacientSchema = Schema({
   }
 });
 
-let Pacient = model('pacient', pacientSchema);
+let Pacient = mongoose.model('pacient', pacientSchema);
 export default Pacient;

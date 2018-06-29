@@ -1,11 +1,11 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
 import { genSalt, hash, compare } from 'bcrypt-nodejs';
 import secretCrypt from '../safety/secretCrypt';
 import { isAlpha, isEmail, isAlphanumeric } from 'validator';
 import { sign } from 'jsonwebtoken';
 
 const SALT_FACTOR = 10;
-let UserSchema = Schema({
+let UserSchema = mongoose.Schema({
   name: {
     type: String,
     lowercase: true,
@@ -139,5 +139,5 @@ UserSchema.post('save', handleE11000);
 UserSchema.post('update', handleE11000);
 UserSchema.post('findOneAndUpdate', handleE11000);
 
-let User = model('User', UserSchema);
+let User = mongoose.model('User', UserSchema);
 export default User;

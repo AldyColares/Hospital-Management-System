@@ -1,6 +1,6 @@
-import { registerMedicene, register } from '../controllers/medicine';
+import controllerRegister from '../controllers/medicine';
 
 export default function (app) {
-  app.get('/register-medicene',  registerMedicene);
-  app.post('/register-medicene', register);
+  app.get('/register-medicene',  controllerRegister.registerMedicene);
+  app.post('/register-medicene', controllerRegister.register);
 }

@@ -1,10 +1,6 @@
-import { isArray } from "util";
-
-let ErrorController = {};
-
-ErrorController.handlingError = function (err, req, res, next) {
+let handlingError = function (err, req, res, next) {
   // Array list of errors of validantion of mongoose.
-  if ( isArray( err.message) ) err.message = err.message.errors;
+  if ( typeof err.message !== 'string') err.message = err.message.errors;
   
   console.error(err.stack);
   res.status(err.status || 500);
@@ -16,4 +12,4 @@ ErrorController.handlingError = function (err, req, res, next) {
   });
 };
 
-export default ErrorController;
+export default handlingError;
