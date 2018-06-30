@@ -2,7 +2,7 @@
 import configDatabase from './configDatabase';
 import express from 'express';
 import logger from 'morgan';
-import { urlencoded } from "body-parser";
+import bodyparse from "body-parser";
 import flash from "connect-flash";
 import session from "cookie-session";
 import seed from '../app/util/seed';
@@ -37,7 +37,7 @@ export default (function () {
     }));
     
     app.use(flash());
-    app.use(urlencoded({ extended: false }));
+    app.use(bodyparse.urlencoded({ extended: false }));
     
     // middleware
     app.use(express.static('./public'));

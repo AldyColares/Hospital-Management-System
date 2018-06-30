@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import { genSalt, hash, compare } from 'bcrypt-nodejs';
-import secretCrypt from '../safety/secretCrypt';
+import hashedPassword from '../safety/secretCrypt';
 import { isAlpha, isEmail, isAlphanumeric } from 'validator';
 import { sign } from 'jsonwebtoken';
 
@@ -48,8 +48,7 @@ let UserSchema = mongoose.Schema({
   idLogin: {
     type: String,
     trim: true,
-    unique: true,
-    
+    //unique: true,
   },
   role: {
     type: String,
@@ -107,7 +106,7 @@ UserSchema.methods.checkPassword = function (guess, next) {
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
   let token = sign({ _id: user._id.toHexString(), role: user.role },
-    secretCrypt.hashedPassword).toString();
+    hashedPassword).toString();
   user.token = token;
 
   return user.save().then(() => {

@@ -104,8 +104,8 @@ userController.registerUserPost = function (req, res, next) {
         if (err) errorMiddleware(err.message, 500, next);
 
         // note: I still can not test with verication send email. 
-        if (env !== 'test') {
-          const setupSendEmail = {},
+        if (env !== 'test' && false) {
+          const setupSendEmail = { },
             emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
               +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
               + token.token + '.\n';
@@ -125,7 +125,7 @@ userController.registerUserPost = function (req, res, next) {
           sendEmailVericationUser(setupSendEmail);
           user.isVerified = true;
         } else {
-          res.status(200).render('confirmToken', { token: '/confirmation?token=' + token.token });
+          res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token });
         }
       });
     });
@@ -149,8 +149,8 @@ userController.confirmationRegisterUser = function (req, res, next) {
       });
     }
 
-    // If we found a token, find a matching user
-    Token.findOne({ _id: token._userId }, function (err, user) {
+    // If found a token, find a matching user
+    User.findOne({ _id: token._userId }, function (err, user) {
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
       );

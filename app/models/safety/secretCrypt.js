@@ -1,3 +1,1 @@
-export default {
-	'hashedPassword' : 'aske9vasdf9egerere9d@sdaslkj'
-};
+export default 'aske9vasdf9egerere9d@sdaslkj';
