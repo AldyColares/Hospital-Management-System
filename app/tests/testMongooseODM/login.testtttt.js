@@ -9,14 +9,14 @@ describe('Functional Test <Sessions>:', function () {
 
   it('should create user session for valid user', function (done) {
     request(app)
-      .post('/v1/sessions')
+      .post('/login')
       .set('Accept', 'application/json')
-      .send({ "email": "user_test@example.com", "password": "123" })
+      .send({"name":"testName", "email": "user_test@example.com", "password": "123" })
       .expect('Content-Type', /json/)
       .expect(200)
       .end(function (err, res) {
         body = res.body;
-        expect(body.id).toEqual('1',["nonono"]);
+        expect(body.loginId).toNotBeA(undefined, ['loginId undefined']);
         expect(body.name).toEqual('user', ["onononon"]);
         expect(body.email).toEqual('exemple@gmail.com',['messagem email']);
         // Save the cookie to use it later to retrieve the session
@@ -26,7 +26,7 @@ describe('Functional Test <Sessions>:', function () {
   });
 
   it('should get user session for current user', function (done) {
-    let req = request(app).get('/v1/sessions');
+    let req = request(app).get('login');
     // Set cookie to get saved user session
     req.cookies = Cookies;
     req.set('Accept', 'application/json')

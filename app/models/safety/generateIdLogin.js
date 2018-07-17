@@ -1,9 +1,15 @@
-/*jshint esversion: 6 */
-const generate = require('nanoid/generate');
+import generate from 'nanoid/generate';
 let allNumbers = '1234567890';
+
 const SIZE_ID_LOGIN = 7;
-// the idLoing of user will be cobination of numbers and initials full name him.
-let idLogin = function (job, nameUser) {
+
+/**
+* The idLoing of user will be cobination of numbers and initials full name him.
+* @param {string} nameUser - The name of user for create idLogin.
+* @returns {string} idLogin 
+* @public
+*/ 
+export default function idLogin (nameUser) {
   let arrayName = nameUser.toLowerCase().split(' '),
     lengthArrayName = arrayName.length,
     initialsName = '';
@@ -24,9 +30,10 @@ let treeFirstLettersJob = (job) => {
   return partJob;
 };
 
+export default idLogin; 
+
 
 let test = new Set();
-module.exports = { idLogin }
 console.time("time");
 for (let i = 0; i < 10; i++) {
   test.add(idLogin('Doctor', 'Jose Cardoso Silva'));

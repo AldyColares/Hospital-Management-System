@@ -9,7 +9,7 @@ let MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return;
       },
-      message: 'the {VALUE} can not by empty'
+      message: 'The {VALUE} can not by empty'
     }
   },
   // Serial of fabric of the drug. It should be required fecht for the validity of the remedies.
@@ -21,7 +21,7 @@ let MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return validator.isAlphanumeric(v);
       },
-      message: 'the {VALUE} can not by empty'
+      message: 'The {VALUE} can not by empty'
     }
   },
   quantity: {
@@ -29,10 +29,12 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        if (validator.isAlphanumeric(v) && v > 0) { return true; }
+        if (validator.isInt(v) && v >= 0) {
+          return true;
+        }
         return false;
       },
-      message: 'the {VALUE} can by more zero or decimal number'
+      message: 'The {VALUE} can by natural number.'
     }
   },
   // the validity of the remedy.
@@ -46,6 +48,7 @@ let MedicineSchema = mongoose.Schema({
       message: ''
     }
   },
+
   prize: {
     type: Number,
     required: true,
@@ -56,6 +59,7 @@ let MedicineSchema = mongoose.Schema({
       message: ''
     }
   },
+
   creatAt: {
     type: Date,
     default: Date.now,
@@ -69,4 +73,5 @@ let MedicineSchema = mongoose.Schema({
 });
 
 let Medicine = mongoose.model("Medicine", MedicineSchema);
+
 export default Medicine;

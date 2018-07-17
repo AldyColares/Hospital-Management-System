@@ -1,7 +1,7 @@
 import User from '../models/MongooseODM/user';
 import flashUser from '../models/flashUser';
 import Token from '../models/MongooseODM/token';
-import  hashedPassword  from '../models/safety/secretCrypt';
+import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../models/errorMiddleware';
@@ -11,7 +11,6 @@ import { sign } from 'jsonwebtoken';
 
 let userController = {},
   env = process.env.NODE_ENV || 'development';
-;
 
 /*
  * GET /login
@@ -105,7 +104,7 @@ userController.registerUserPost = function (req, res, next) {
 
         // note: I still can not test with verication send email. 
         if (env !== 'test' && false) {
-          const setupSendEmail = { },
+          const setupSendEmail = {},
             emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
               +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
               + token.token + '.\n';
@@ -138,7 +137,7 @@ userController.registerUserPost = function (req, res, next) {
  */
 userController.confirmationRegisterUser = function (req, res, next) {
 
-  // Find a matching token
+  // Find a matching token.
   Token.findOne({ token: req.query.token }, function (err, token) {
     if (err) errorMiddleware(err.message, 500, next);
 
@@ -154,20 +153,19 @@ userController.confirmationRegisterUser = function (req, res, next) {
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
       );
-      
+
       if (user.isVerified) return res.status(400).send(
-        { 
-          type: 'already-verified', 
-          msg: 'This user has already been verified.' 
+        {
+          type: 'already-verified',
+          msg: 'This user has already been verified.'
         });
 
       // Verify and save the user
       user.isVerified = true;
-      user.idLogin = generateIdLogin(user._id, user.name);
+      user.idLogin = generateIdLogin(user.name);
       res.user = user.idLogin;
       user.save(function (err) {
         if (err) { return res.status(500).send({ msg: err.message }); }
-        //res.status(200).send("The account has been verified. Please log in.");
       });
       // The user going redirect for main page.
 
@@ -214,20 +212,35 @@ userController.resendTokenPost = function (req, res, next) {
   });
 };
 
-userController.updateProfile = function (req, res, next) {
+userController.deleteProfile = async function (req, res, next) {
+  const body = req.body,
+    idLoginUser = req.body.idLogin;
+  User.deleteOne({ idLogin: idLoginUser }, function (err) {
+    errorMiddleware(err.message, 500, next);
+  });
+
+}
+
+
+userController.updateProfile = async function (req, res, next) {
   const body = req.body,
     idLoginUser = req.body.idLogin,
-    update = pluck(body, 'birth', 'age', 'gender'),
+    update = plu ck(body, 'birth', 'age', 'gender'),
     options = { new: true, runValidators: true };
   delete req.body.idLogin;
-  User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options, (err, updated) => {
-    if (err) {
-      err.status = 500;
-      next(err);
-    }
-    console.log(updated);
-    next();
-  });
+  try {
+    let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options);
+      console.log(updated);
+      if (!updatedUser) {
+        res.status(404).send()
+      } else {
+        res.status(200).redirect('update-profile');
+
+      }
+  } catch (err) {
+    err.status = 500;
+    next(err);
+  }
 };
 
 export default userController;
