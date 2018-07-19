@@ -2,7 +2,7 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 
 let MedicineSchema = mongoose.Schema({
-  code: {
+  name: {
     type: String,
     required: true,
     validate: {

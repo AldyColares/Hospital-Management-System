@@ -1,5 +1,5 @@
 /**
- *  Setup of error layer of the Middleware of express.
+ * Setup of error layer of the Middleware of express.
  * 
  * @param {String | Array} message - The list of message of erros.
  * @param {Number} status - The status code http. 

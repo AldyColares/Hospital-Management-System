@@ -225,7 +225,7 @@ userController.deleteProfile = async function (req, res, next) {
 userController.updateProfile = async function (req, res, next) {
   const body = req.body,
     idLoginUser = req.body.idLogin,
-    update = plu ck(body, 'birth', 'age', 'gender'),
+    update = pluck(body, 'birth', 'age', 'gender'),
     options = { new: true, runValidators: true };
   delete req.body.idLogin;
   try {
