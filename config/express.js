@@ -1,4 +1,3 @@
-
 import configDatabase from './configDatabase';
 import express from 'express';
 import logger from 'morgan';
@@ -13,6 +12,7 @@ import mainPageUser from '../app/routes/mainPageUser';
 import login from '../app/routes/user';
 import error from '../app/routes/handlingError';
 
+const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
 
 export default (function () {
     let app = express();
@@ -25,7 +25,6 @@ export default (function () {
     // configuração de ambiente
     app.set('port', process.env.PORT || 3000);
 
-    const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
     app.use(session({
         secret: "TKRv0IJs=HYqrvagQ#&!F!%V]Ww/4KiVs$s,<<MX",
         name: "sessionId",

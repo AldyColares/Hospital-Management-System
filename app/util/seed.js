@@ -1,4 +1,6 @@
 import User from '../models/MongooseODM/user';
+import medicine from '../models/MongooseODM/medicine';
+import Medicine from '../models/MongooseODM/medicine';
 
 // Insert documents of collection for test or es
 export default function () {
@@ -18,6 +20,5 @@ export default function () {
       user.generateAuthToken();
       console.info('insert account admin! id: jm948d password: userOnePass');
     }
-  });
-  
+  }); 
 };

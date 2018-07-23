@@ -6,7 +6,7 @@ export default function (app) {
   
   app.get('/read-medicine', controllerMedicine.read);
   
-  app.post('/delete-medicine', controllerMedicine.delete);
+  app.delete('/delete-medicine', controllerMedicine.delete);
   
-  app.post('/update-quantity-medicine', controllerMedicine.incremOrDecremQauntityMedicine);
+  app.path('/update-quantity-medicine', controllerMedicine.incremOrDecremQauntityMedicine);
 }
