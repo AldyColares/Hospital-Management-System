@@ -29,7 +29,7 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        if (validator.isInt(v) && v >= 0) {
+        if ( v >= 0) {
           return true;
         }
         return false;

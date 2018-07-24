@@ -8,5 +8,6 @@ export default function (app) {
   
   app.delete('/delete-medicine', controllerMedicine.delete);
   
-  app.path('/update-quantity-medicine', controllerMedicine.incremOrDecremQauntityMedicine);
+  app.patch('/update-medicine/:id', controllerMedicine.update);
+  app.patch('/update-quantity-medicine/', controllerMedicine.incremOrDecremQauntityMedicine);
 }

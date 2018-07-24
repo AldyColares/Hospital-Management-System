@@ -18,7 +18,8 @@ export default function () {
     mongoose.set('debug', false);
     mongoose.Promise = global.Promise;
     mongoose.connection.openUri(uriBD);
-   // mongoose.connection.dropDatabase();
+    
+    // mongoose.connection.dropDatabase();
     console.log( __dirname +  'dropDatabase');
     mongoose.connection.on('connected', function () {
         console.log('Mongoose! Connect in ' + uriBD);

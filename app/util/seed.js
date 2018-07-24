@@ -1,5 +1,4 @@
 import User from '../models/MongooseODM/user';
-import medicine from '../models/MongooseODM/medicine';
 import Medicine from '../models/MongooseODM/medicine';
 
 // Insert documents of collection for test or es
@@ -20,5 +19,18 @@ export default function () {
       user.generateAuthToken();
       console.info('insert account admin! id: jm948d password: userOnePass');
     }
-  }); 
+  });
+  Medicine.findOne({ name: 'testMedicine' }, function (err, medicine) {
+    if (!medicine) {
+      medicine = new Medicine({
+        name: 'testMedicine',
+        batch: '12345',
+        quantity: 3,
+        expiration: new Date(2020, 10, 20),
+        prize: 3.40,
+      });
+      medicine.save(err);
+      console.info('insert medicine: testMedicine');
+    }
+  });
 };

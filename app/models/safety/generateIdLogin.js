@@ -9,7 +9,7 @@ const SIZE_ID_LOGIN = 7;
 * @returns {string} idLogin 
 * @public
 */ 
-export default function idLogin (nameUser) {
+let idLogin = function (nameUser) {
   let arrayName = nameUser.toLowerCase().split(' '),
     lengthArrayName = arrayName.length,
     initialsName = '';
@@ -32,7 +32,7 @@ let treeFirstLettersJob = (job) => {
 
 export default idLogin; 
 
-
+/*
 let test = new Set();
 console.time("time");
 for (let i = 0; i < 10; i++) {
@@ -40,3 +40,4 @@ for (let i = 0; i < 10; i++) {
 }
 console.timeEnd("time");
 console.log('the size is ' + test.size);
+*/

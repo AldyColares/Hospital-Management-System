@@ -8,7 +8,6 @@ import errorMiddleware from '../models/errorMiddleware';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
 
-
 let userController = {},
   env = process.env.NODE_ENV || 'development';
 

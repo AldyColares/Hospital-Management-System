@@ -1,9 +1,10 @@
 import flashUser from '../models/flashUser';
 import Medicine from '../models/MongooseODM/medicine';
+import {ObjectID} from 'mongodb';
 import mongoose from 'mongoose';
 import errorMiddleware from '../models/errorMiddleware';
 import pluck from '../util/pluck';
-import respondInFormatJSON from '../models/centralInformationModel';
+import respondInFormatJSON from '../models/respondInFormatJSON';
 
 let controllerRegister = {};
 
@@ -39,7 +40,7 @@ controllerRegister.registerMedicine = function (req, res, next) {
 
 controllerRegister.read = function (req, res, next) {
   if (req.query.code) {
-    message = { 'message': 'The name field of medicine do not found', 'statusStockMedicine': 'bad request' };
+    message = { 'message': 'The name field of medicine do not found', 'success': false };
     return respondInFormatJSON(res, 400, message, next);
   };
   const name = req.query.name;
@@ -47,7 +48,7 @@ controllerRegister.read = function (req, res, next) {
   Medicine.find({ 'name': name }, null, { sort: { 'expiration': 1 } }, function (err, listMedicine) {
     if (err) errorMiddleware(err.message, 500, next);
     if (!listMedicine) {
-      message = { 'message': 'The name of medicine do not exist.', 'statusStockMedicine': 'not exist' }
+      message = { 'message': 'The name of medicine do not exist.', 'success': false }
       respondInFormatJSON(res, 403, message, next);
     }
     respondInFormatJSON(res, 200, message, next);
@@ -56,14 +57,20 @@ controllerRegister.read = function (req, res, next) {
 
 controllerRegister.update = function (req, res, next) {
   //Pedent: Check if body === {} and feedback for client.
-  const code = req.body.code,
-    update = req.body,
-    options = { new: true, runValidators: true };
+  const id = req.params.id,
+  update = req.body,
+  options = { new: true, runValidators: true };
+  console.log(req.body);
+  if(!ObjectID.isValid(id)) return respondInFormatJSON(res, 404, 'Not found id medicine', next);
 
-  Medicine.updateOne({ 'code': code }, { $set: { update } }, options, function (err, doc) {
-    if (err) errorMiddleware(err.message, 500, next);
+  // The example use Promise end Mongoose.
+  Medicine.findByIdAndUpdate(id, {$set: update}, options).then((docUpdated) => {
+    if (!docUpdated) return res.status(404).type('json').json({message:'Not found medicine.'});
+    return res.status(200).type('json').json(docUpdated);
 
-    if (doc) return res.status(200).type('json').json(doc);
+  }).catch((err) => {
+    console.log(err.message);
+    errorMiddleware(err.message, 400, next);
   });
 }
 
@@ -77,7 +84,7 @@ controllerRegister.incremOrDecremQauntityMedicine = function (req, res, next) {
 
   // if the user insert the valor zero for decrement or encrease.
   if (!incrementOrdecrement) {
-    message = { 'message': 'The valor is zero', 'statusStockMedicine': 'Request valor of client is zero' };
+    message = { 'message': 'The valor is zero.', 'success': false };
     return respondInFormatJSON(res, 412, message, next);
   };
 
@@ -86,31 +93,30 @@ controllerRegister.incremOrDecremQauntityMedicine = function (req, res, next) {
     if (medicine) {
       const quantityMed = medicine.quantity;
       if (!quantityMed) {
-        message = { 'message': 'the medicine is over.', 'statusStockMedicine': 'quantity is zero' };
+        message = { 'message': 'the medicine is over.', 'success': false };
         return respondInFormatJSON(res, 200, message, next);
       }
 
       if (quantityMed > incrementOrdecrement) {
         const newQuantityMed = quantityMed - incrementOrdecrement;
         Medicine.updateOne({ 'code': code }, { set: { quantity: newQuantityMed } }, options, function (err, medicine) {
-          message = { 'message': 'successful removed of stock.', 'statusStockMedicine': 'successful' };
+          message = { 'message': 'successful removed of stock.', 'success': true };
           return respondInFormatJSON(res, 200, message, next);
 
         });
       } else {
         let messageUser = `The stock of the medicine is insufficient. The quantity in the stock: ${quantityMed}`;
-        const message = { 'message': messageUser, 'statusStockMedicine': 'stock insufficient' }
+        const message = { 'message': messageUser, 'success': false }
         return respondInFormatJSON(res, 200, message, next);
       }
     }
 
-    const messageUser = `Medicine  ${req.body.code} do not found.`;
-    message = { 'message': messageUser, 'statusStockMedicine': 'not found' }
+    const messageUser = `Medicine ${req.body.code} do not found.`;
+    message = { 'message': messageUser, 'success': false }
     return respondInFormatJSON(res, 200, message, next);
 
   });
 }
-
 
 controllerRegister.delete = function (req, res, next) {
   const code = req.body.code;
