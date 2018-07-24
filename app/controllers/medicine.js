@@ -3,8 +3,8 @@ import Medicine from '../models/MongooseODM/medicine';
 import {ObjectID} from 'mongodb';
 import mongoose from 'mongoose';
 import errorMiddleware from '../models/errorMiddleware';
-import pluck from '../util/pluck';
 import respondInFormatJSON from '../models/respondInFormatJSON';
+import pluck from '../util/pluck';
 
 let controllerRegister = {};
 
