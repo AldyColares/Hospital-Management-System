@@ -1,3 +1,4 @@
+import './configDatabase';
 import mongoose from 'mongoose';
 
 let options = {
@@ -11,16 +12,17 @@ let options = {
   };
 
 const uriBD = process.env.MONGODB_URI; 
-
 export default function () {
-
+    
+    //console.log("dfgdgd  "+process.env.MONGODB_URI);
     //mongoose.connect('mongodb://localhost:27017/HospitalManagementSystem');
     mongoose.set('debug', false);
     mongoose.Promise = global.Promise;
-    mongoose.connection.openUri(uriBD);
     
+    mongoose.connect(uriBD, function(err){
+        console.log(err);
+    });
     // mongoose.connection.dropDatabase();
-    console.log( __dirname +  'dropDatabase');
     mongoose.connection.on('connected', function () {
         console.log('Mongoose! Connect in ' + uriBD);
     });

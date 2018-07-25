@@ -4,7 +4,7 @@
   "version": "0.4.5",
   "description": "",
   "scripts": {
-    "test": "export NODE_ENV = test || SET NODE_ENV=test && mocha app/tests/**/*.test.js",
+    "test": "export NODE_ENV=test || SET NODE_ENV=test && mocha -r esm app/tests/**/*.test.js",
     "start": "nodemon -r esm app.js"
   },
   "author": "aldy colares de souza",

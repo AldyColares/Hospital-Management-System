@@ -4,13 +4,13 @@ const mongoose = require('mongoose'),
 let recordSchema = mongoose.Schema({
   patientId: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true
   },
   recordNo: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true
   },
@@ -19,16 +19,17 @@ let recordSchema = mongoose.Schema({
     require: true,
     lowercare: true,
     trim: true,
-    require: [true, 'discription is required.']
+    required: [true, 'discription is required.']
   },
   appoinmest: {
     type: String,
     require: true,
     lowercare: true,
     trim: true,
-    require: [true, 'appoinmest is required.']
+    required: [true, 'appoinmest is required.']
   }
 });
 
 let Record = mongoose.model('record', recordSchema);
 module.exports = Record;
+

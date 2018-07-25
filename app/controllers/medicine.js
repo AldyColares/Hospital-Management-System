@@ -60,7 +60,6 @@ controllerRegister.update = function (req, res, next) {
   const id = req.params.id,
   update = req.body,
   options = { new: true, runValidators: true };
-  console.log(req.body);
   if(!ObjectID.isValid(id)) return respondInFormatJSON(res, 404, 'Not found id medicine', next);
 
   // The example use Promise end Mongoose.
