@@ -5,7 +5,7 @@ import app from '../server';
 
 let Cookies, body;
 
-describe('Functional Test <Sessions>:', function () {
+describe('POST /login', function () {
 
   it('should create user session for valid user', function (done) {
     request(app)
@@ -26,7 +26,8 @@ describe('Functional Test <Sessions>:', function () {
   });
 
   it('should get user session for current user', function (done) {
-    let req = request(app).get('login');
+    let req = request(app)
+    .get('login');
     // Set cookie to get saved user session
     req.cookies = Cookies;
     req.set('Accept', 'application/json')
@@ -34,10 +35,9 @@ describe('Functional Test <Sessions>:', function () {
       .expect(200)
       .end(function (err, res) {
         expect(body.id).toBeA('1');
-        expect()
-        body.id.should.equal('1');
-        body.short_name.should.equal('Test user');
-        body.email.should.equal('user_test@example.com');
+        expect(body.id.should.equal('1'));
+        expect(body.short_name.should.equal('Test user'));
+        expect(body.email.should.equal('user_test@example.com'));
         done();
       });
   });

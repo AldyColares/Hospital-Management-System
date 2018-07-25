@@ -8,8 +8,8 @@ import errorMiddleware from '../models/errorMiddleware';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
 
-let userController = {},
-  env = process.env.NODE_ENV || 'development';
+let userController = {}
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 /*
  * GET /login
@@ -102,10 +102,10 @@ userController.registerUserPost = function (req, res, next) {
         if (err) errorMiddleware(err.message, 500, next);
 
         // note: I still can not test with verication send email. 
-        if (env !== 'test' && false) {
+        if (NODE_ENV !== 'test') {
           const setupSendEmail = {},
             emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
-              +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
+              +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation-register-user\/'
               + token.token + '.\n';
 
           setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
@@ -121,7 +121,6 @@ userController.registerUserPost = function (req, res, next) {
           setupSendEmail.res = res;
           setupSendEmail.next = next;
           sendEmailVericationUser(setupSendEmail);
-          user.isVerified = true;
         } else {
           res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token });
         }
@@ -149,6 +148,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
     // If found a token, find a matching user
     User.findOne({ _id: token._userId }, function (err, user) {
+      if(err) return errorMiddleware(err.message, 500, next);
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
       );
@@ -229,13 +229,13 @@ userController.updateProfile = async function (req, res, next) {
   delete req.body.idLogin;
   try {
     let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options);
-      console.log(updated);
-      if (!updatedUser) {
-        res.status(404).send()
-      } else {
-        res.status(200).redirect('update-profile');
+    console.log(updated);
+    if (!updatedUser) {
+      res.status(404).send()
+    } else {
+      res.status(200).redirect('update-profile');
 
-      }
+    }
   } catch (err) {
     err.status = 500;
     next(err);
