@@ -46,7 +46,7 @@ controllerRegister.read = function (req, res, next) {
   const name = req.query.name;
   // ueturn all medicine with same name. the medicines have expiration.
   Medicine.find({ 'name': name }, null, { sort: { 'expiration': 1 } }, function (err, listMedicine) {
-    if (err) errorMiddleware(err.message, 500, next);
+    if (err) errorMiddleware(err, 500, next);
     if (!listMedicine) {
       message = { 'message': 'The name of medicine do not exist.', 'success': false }
       respondInFormatJSON(res, 403, message, next);
@@ -68,8 +68,8 @@ controllerRegister.update = function (req, res, next) {
     return res.status(200).type('json').json(docUpdated);
 
   }).catch((err) => {
-    console.log(err.message);
-    errorMiddleware(err.message, 400, next);
+    console.log(err);
+    errorMiddleware(err, 400, next);
   });
 }
 
@@ -88,7 +88,7 @@ controllerRegister.incremOrDecremQauntityMedicine = function (req, res, next) {
   };
 
   Medicine.findOne({ 'code': code }, function (err, medicine) {
-    if (err) errorMiddleware(err.message, 503, next);
+    if (err) errorMiddleware(err, 503, next);
     if (medicine) {
       const quantityMed = medicine.quantity;
       if (!quantityMed) {
@@ -120,7 +120,7 @@ controllerRegister.incremOrDecremQauntityMedicine = function (req, res, next) {
 controllerRegister.delete = function (req, res, next) {
   const code = req.body.code;
   Medicine.deleteOne({ code: code }, function (err) {
-    if (err) errorMiddleware(err.message, 500, next);
+    if (err) errorMiddleware(err, 500, next);
 
     return res.status(200).type('json').json({
       message: 'Medicine successful deleted'

@@ -84,5 +84,18 @@ let pacientSchema = mongoose.Schema({
   }
 });
 
+let handleE11000 = function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('File duplication error in database.'));
+  } else {
+    next(error);
+  }
+};
+
+pacientSchema.post('save', handleE11000);
+pacientSchema.post('update', handleE11000);
+pacientSchema.post('findOneAndUpdate', handleE11000);
+pacientSchema.post('insertMany', handleE11000);
+
 let Pacient = mongoose.model('pacient', pacientSchema);
 export default Pacient;

@@ -41,5 +41,19 @@ let roomSchema = mongoose.Schema({
   }
 });
 
+let handleE11000 = function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('File duplication error in database.'));
+  } else {
+    next(error);
+  }
+};
+
+roomSchema.post('save', handleE11000);
+roomSchema.post('update', handleE11000);
+roomSchema.post('findOneAndUpdate', handleE11000);
+roomSchema.post('insertMany', handleE11000);
+
 let Room = mongose.model('room', roomSchema);
 export default { Room };
+

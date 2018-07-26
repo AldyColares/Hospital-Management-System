@@ -10,7 +10,7 @@ let UserSchema = mongoose.Schema({
     type: String,
     lowercase: true,
     trim: true,
-    require: true,
+    required: true,
     unique: true,
     validate: {
       validator: function (v) {
@@ -22,7 +22,7 @@ let UserSchema = mongoose.Schema({
   },
   password: {
     type: String,
-    require: true,
+    required: true,
     validate: {
       validator: function (v) {
         return isAlphanumeric(v);
@@ -36,14 +36,13 @@ let UserSchema = mongoose.Schema({
     unique: true,
     lowercare: true,
     trim: true,
+    required: [true, 'User email required'],
     validate: {
       validator: function (v) {
         return isEmail(v);
       },
       message: 'the {VALUE} is not email valide address! Use "exemple@gmail.com" as model.'
-    },
-    required: [true, 'User email required']
-
+    }
   },
   idLogin: {
     type: String,
@@ -52,17 +51,17 @@ let UserSchema = mongoose.Schema({
   },
   role: {
     type: String,
-    require: true,
+    required: true,
     trim: true
   },
   token: {
     type: String,
-    require: true,
+    required: true,
     trim: true
   },
   job: {
     type: String,
-    require: true
+    required: true
   },
   phone: {
     type: String,
@@ -77,21 +76,6 @@ let UserSchema = mongoose.Schema({
   creatAt: { type: Date, default: Date.now }
 });
 
-UserSchema.pre('save', function (done) {
-  let user = this;
-  //Returns true if this document was modified in password.
-  if (!user.isModified("password")) {
-    return done();
-  }
-  genSalt(SALT_FACTOR, (err, salt) => {
-    let progress = function () { };
-    hash(user.password, salt, progress, (err, hashedPassword) => {
-      if (err) { return done(err); }
-      user.password = hashedPassword;
-      done();
-    });
-  });
-});
 
 UserSchema.methods.checkPassword = function (guess, next) {
   compare(guess, this.password, function (err, isMatch) {
@@ -126,17 +110,34 @@ UserSchema.statics.findByCredentials = (user, loginPassword) => {
   });
 };
 
-let handleE11000 = function (error, res, next) {
+UserSchema.pre('save', function (done) {
+  let user = this;
+  //Returns true if this document was modified in password.
+  if (!user.isModified("password")) {
+    return done();
+  }
+  genSalt(SALT_FACTOR, (err, salt) => {
+    let progress = function () { };
+    hash(user.password, salt, progress, (err, hashedPassword) => {
+      if (err) { return done(err); }
+      user.password = hashedPassword;
+      done();
+    });
+  });
+});
+
+let handleE11000 = function (error, doc, next) {
   if (error.name === 'MongoError' && error.code === 11000) {
-    next(new Error('There was a duplicate key error'));
+    next(new Error('File duplication error in database.'));
   } else {
-    next();
+    next(error);
   }
 };
 
 UserSchema.post('save', handleE11000);
 UserSchema.post('update', handleE11000);
 UserSchema.post('findOneAndUpdate', handleE11000);
+Userschema.post('insertMany', handleE11000);
 
 let User = mongoose.model('User', UserSchema);
 export default User;

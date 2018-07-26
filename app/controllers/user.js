@@ -5,6 +5,7 @@ import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../models/errorMiddleware';
+import respondeFormatJSON from '../models/respondInFormatJSON';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
 
@@ -15,7 +16,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
  * GET /login
  * Just for render of page login and in the future identification Token.
  */
-
+// **PENDENT** Creat the Token for each request for client login.
 userController.login = function (req, res) {
   flashUser(req, res);
   res.render('login');
@@ -26,14 +27,18 @@ userController.login = function (req, res) {
  * Sign in with email and password
  */
 userController.loginPost = function (req, res, next) {
-  let body = req.body;
+  let body = req.body, message = '';
   flashUser(req, res);
+
   User.findOne({ name: body.name }, function (err, user) {
-    if (!user) return res.status(401).send({
-      msg: 'The email address ' + req.body.email +
+    if (err) return errorMiddleware(err.message, 500, next);
+    if (!user) {
+      message = 'The email address ' + req.body.email +
         ' is not associated with any account.' +
-        'Double-check your email address and try again.'
-    });
+        'Double-check your email address and try again.';
+      return respondeFormatJSON(res, 400, message, next);
+    }
+
     let resultCheckPassword = user.checkPassword(body.password, next);
     if (resultCheckPassword) {
       res.locals.currentUser = user.name;
@@ -148,7 +153,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
     // If found a token, find a matching user
     User.findOne({ _id: token._userId }, function (err, user) {
-      if(err) return errorMiddleware(err.message, 500, next);
+      if (err) return errorMiddleware(err.message, 500, next);
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
       );

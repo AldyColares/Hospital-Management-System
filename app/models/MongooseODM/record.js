@@ -1,7 +1,7 @@
-const mongoose = require('mongoose'),
-  npmValidate = require('validator');
+import { Schema, model } from 'mongoose';
+import npmValidate from 'validator';
 
-let recordSchema = mongoose.Schema({
+let recordSchema = Schema({
   patientId: {
     type: String,
     required: true,
@@ -30,6 +30,19 @@ let recordSchema = mongoose.Schema({
   }
 });
 
-let Record = mongoose.model('record', recordSchema);
-module.exports = Record;
+let handleE11000 = function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('File duplication error in database.'));
+  } else {
+    next(error);
+  }
+};
+
+recordSchema.post('save', handleE11000);
+recordSchema.post('update', handleE11000);
+recordSchema.post('findOneAndUpdate', handleE11000);
+recordSchema.post('insertMany', handleE11000);
+
+let Record = model('record', recordSchema);
+export default Record;
 

@@ -96,5 +96,13 @@ const mongoose = require('mongoose'),
   }
   );
 
+  schema.post('save', function(error, doc, next) {
+    if (error.name === 'MongoError' && error.code === 11000) {
+      next(new Error('There was a duplicate key error'));
+    } else {
+      next(error);
+    }
+  });
+
 const Employee = mongoose.model('employee', employeeSchema);
 module.exports = { Employee, nameFieldDocuments };

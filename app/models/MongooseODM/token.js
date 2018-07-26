@@ -1,10 +1,37 @@
-let mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
+const ONE_DAY = 43200;
 const tokenSchema = new mongoose.Schema({
-  _userId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'User' },
-  token: { type: String, required: true },
-  createdAt: { type: Date, required: true, default: Date.now, expires: 43200 }
+  _userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+  token: {
+    type: String,
+    required: true
+  },
+  createdAt: {
+    type: Date, required: true,
+    default: Date.now, expires: ONE_DAY
+  }
 });
 
+// If is duplication of error.
+
+let handleE11000 = function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('Date duplication error in database.'));
+  } else {
+    next(error);
+  }
+};
+arquivo
+tokenSchema.post('save', handleE11000);
+tokenSchema.post('update', handleE11000);
+tokenSchema.post('findOneAndUpdate', handleE11000);
+tokenschema.post('insertMany', handleE11000);
+
 let Token = mongoose.model("Token", tokenSchema);
-module.exports = Token;
+
+export default Token;
