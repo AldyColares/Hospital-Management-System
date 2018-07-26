@@ -1,7 +1,7 @@
 /**
  * Setup of error layer of the Middleware of express.
  * 
- * @param {String | Array} error - The object error.
+ * @param {Object} error - The object error.
  * @param {Number} status - The status code http. 
  * @param {Object} next - Callback from error Middleware. 
  */

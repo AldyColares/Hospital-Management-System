@@ -1,36 +1,38 @@
 import flashUser from '../models/flashUser';
 import Medicine from '../models/MongooseODM/medicine';
-import {ObjectID} from 'mongodb';
+import mongoose, {ObjectID} from 'mongodb';
 import mongoose from 'mongoose';
 import errorMiddleware from '../models/errorMiddleware';
-import respondInFormatJSON from '../models/respondInFormatJSON';
+import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 
 let controllerRegister = {};
 
 controllerRegister.loadPageRegisterMedicine = function (req, res) {
   flashUser(req, res);
-
   return res.render('registerMedicine');
 };
 
 controllerRegister.registerMedicine = function (req, res, next) {
   flashUser(req, res);
   const body = req.body;
+  let message = 'You send the empty fields.'
+  if(!body) return sendJsonResponse(res, 400, message, next);
+  
   Object.freeze(body);
 
-  mongoose.findOne({ code: code }, function (err, foundMedicine) {
+  Medicine.findOne({ batch: body.batch }, function (err, foundMedicine) {
     if (err) {
       err.status = 503;
       return next(err);
     }
     if (foundMedicine) {
-      let error = new Error('The medicine code you have entered is already associated' +
-        'with another code.');
+      let error = new Error('The medicine batch you have entered is already associated' +
+        'with another batch.');
       error.status = 400;
       return next(error);
     }
-    let fileMedicine = pluck(body, 'code', 'batch', 'quantity', 'expiration', 'prize');
+    let fileMedicine = pluck(body, 'name', 'batch', 'quantity', 'expiration', 'prize');
     let newMedicine = new Medicine(fileMedicine);
     newMedicine.save(next);
     req.flash('info', `The of code medicine: ${req.body.code} registered successful`);
@@ -41,7 +43,7 @@ controllerRegister.registerMedicine = function (req, res, next) {
 controllerRegister.read = function (req, res, next) {
   if (req.query.code) {
     message = { 'message': 'The name field of medicine do not found', 'success': false };
-    return respondInFormatJSON(res, 400, message, next);
+    return sendJsonResponse(res, 400, message, next);
   };
   const name = req.query.name;
   // ueturn all medicine with same name. the medicines have expiration.
@@ -49,9 +51,9 @@ controllerRegister.read = function (req, res, next) {
     if (err) errorMiddleware(err, 500, next);
     if (!listMedicine) {
       message = { 'message': 'The name of medicine do not exist.', 'success': false }
-      respondInFormatJSON(res, 403, message, next);
+      sendJsonResponse(res, 403, message, next);
     }
-    respondInFormatJSON(res, 200, message, next);
+    sendJsonResponse(res, 200, message, next);
   });
 }
 
@@ -60,7 +62,7 @@ controllerRegister.update = function (req, res, next) {
   const id = req.params.id,
   update = req.body,
   options = { new: true, runValidators: true };
-  if(!ObjectID.isValid(id)) return respondInFormatJSON(res, 404, 'Not found id medicine', next);
+  if(!ObjectID.isValid(id)) return sendJsonResponse(res, 404, 'Not found id medicine', next);
 
   // The example use Promise end Mongoose.
   Medicine.findByIdAndUpdate(id, {$set: update}, options).then((docUpdated) => {
@@ -74,57 +76,56 @@ controllerRegister.update = function (req, res, next) {
 }
 
 controllerRegister.incremOrDecremQauntityMedicine = function (req, res, next) {
-  const code = req.body.code,
+  const id = req.params.id,
     incremOrdecrem = req.body.incrementOrdecrement,
     options = { new: true, runValidators: true };
 
   let message = {},
     newQuantityMed = '';
+    if(!ObjectID.isValid(id)) return sendJsonResponse(res, 404, 'Not found id medicine', next);
 
   // if the user insert the valor zero for decrement or encrease.
   if (!incrementOrdecrement) {
     message = { 'message': 'The valor is zero.', 'success': false };
-    return respondInFormatJSON(res, 412, message, next);
+    return sendJsonResponse(res, 412, message, next);
   };
 
-  Medicine.findOne({ 'code': code }, function (err, medicine) {
+  Medicine.findOne({ _id : id }, function (err, medicine) {
     if (err) errorMiddleware(err, 503, next);
     if (medicine) {
       const quantityMed = medicine.quantity;
       if (!quantityMed) {
         message = { 'message': 'the medicine is over.', 'success': false };
-        return respondInFormatJSON(res, 200, message, next);
+        return sendJsonResponse(res, 200, message, next);
       }
 
       if (quantityMed > incrementOrdecrement) {
         const newQuantityMed = quantityMed - incrementOrdecrement;
         Medicine.updateOne({ 'code': code }, { set: { quantity: newQuantityMed } }, options, function (err, medicine) {
           message = { 'message': 'successful removed of stock.', 'success': true };
-          return respondInFormatJSON(res, 200, message, next);
+          return sendJsonResponse(res, 200, message, next);
 
         });
       } else {
         let messageUser = `The stock of the medicine is insufficient. The quantity in the stock: ${quantityMed}`;
         const message = { 'message': messageUser, 'success': false }
-        return respondInFormatJSON(res, 200, message, next);
+        return sendJsonResponse(res, 200, message, next);
       }
     }
 
     const messageUser = `Medicine ${req.body.code} do not found.`;
     message = { 'message': messageUser, 'success': false }
-    return respondInFormatJSON(res, 200, message, next);
+    return sendJsonResponse(res, 200, message, next);
 
   });
 }
 
 controllerRegister.delete = function (req, res, next) {
-  const code = req.body.code;
-  Medicine.deleteOne({ code: code }, function (err) {
+  const id = req.body.id;
+  Medicine.deleteOne({ _id: id }, function (err) {
     if (err) errorMiddleware(err, 500, next);
 
-    return res.status(200).type('json').json({
-      message: 'Medicine successful deleted'
-    });
+    return sendJsonResponse(res, 200, 'Medicine successful deleted', next);
   });
 }
 

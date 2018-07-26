@@ -24,7 +24,7 @@ let pluck = (object, ...keys) => {
   }
   const newObject = {};
   keys.forEach(key => {
-    newObject[key] = object[key]
+    newObject[key] = object[key];
     if (!object[key]) {
       err = new Error(`Error: The object passed not have properties ${key} \n ${object}`);
       console.error(err.message + "\n" + err.stack);

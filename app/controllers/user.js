@@ -5,7 +5,7 @@ import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../models/errorMiddleware';
-import respondeFormatJSON from '../models/respondInFormatJSON';
+import sendJsonResponse from '../models/respondInFormatJSON';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
 
@@ -31,12 +31,12 @@ userController.loginPost = function (req, res, next) {
   flashUser(req, res);
 
   User.findOne({ name: body.name }, function (err, user) {
-    if (err) return errorMiddleware(err.message, 500, next);
+    if (err) return errorMiddleware(err, 500, next);
     if (!user) {
       message = 'The email address ' + req.body.email +
         ' is not associated with any account.' +
         'Double-check your email address and try again.';
-      return respondeFormatJSON(res, 400, message, next);
+      return sendJsonResponse(res, 400, message, next);
     }
 
     let resultCheckPassword = user.checkPassword(body.password, next);
@@ -78,7 +78,7 @@ userController.registerUserPost = function (req, res, next) {
   }
   // Make sure this account doesn't already exist
   User.findOne({ email: req.body.email }, function (err, user) {
-    if (err) errorMiddleware(err.message, 500, next);
+    if (err) errorMiddleware(err, 500, next);
 
     // Make sure user doesn't already exist
     if (user) errorMiddleware('The email address you have entered is already associated' +
@@ -91,7 +91,7 @@ userController.registerUserPost = function (req, res, next) {
     user = new User(fileUser);
 
     user.validate(function (err) {
-      if (err) errorMiddleware(err.message, 428, next);
+      if (err) errorMiddleware(err, 428, next);
     });
 
     user.save(function (err) {
@@ -104,7 +104,7 @@ userController.registerUserPost = function (req, res, next) {
 
       // Save date base of the verification token.
       token.save(function (err) {
-        if (err) errorMiddleware(err.message, 500, next);
+        if (err) errorMiddleware(err, 500, next);
 
         // note: I still can not test with verication send email. 
         if (NODE_ENV !== 'test') {
@@ -142,7 +142,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
   // Find a matching token.
   Token.findOne({ token: req.query.token }, function (err, token) {
-    if (err) errorMiddleware(err.message, 500, next);
+    if (err) errorMiddleware(err, 500, next);
 
     if (!token) {
       return res.status(400).send({
@@ -153,7 +153,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
     // If found a token, find a matching user
     User.findOne({ _id: token._userId }, function (err, user) {
-      if (err) return errorMiddleware(err.message, 500, next);
+      if (err) return errorMiddleware(err, 500, next);
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
       );
@@ -220,7 +220,7 @@ userController.deleteProfile = async function (req, res, next) {
   const body = req.body,
     idLoginUser = req.body.idLogin;
   User.deleteOne({ idLogin: idLoginUser }, function (err) {
-    errorMiddleware(err.message, 500, next);
+    errorMiddleware(err, 500, next);
   });
 
 }
