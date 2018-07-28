@@ -26,11 +26,10 @@ let handleE11000 = function (error, doc, next) {
     next(error);
   }
 };
-arquivo
 tokenSchema.post('save', handleE11000);
 tokenSchema.post('update', handleE11000);
 tokenSchema.post('findOneAndUpdate', handleE11000);
-tokenschema.post('insertMany', handleE11000);
+tokenSchema.post('insertMany', handleE11000);
 
 let Token = mongoose.model("Token", tokenSchema);
 

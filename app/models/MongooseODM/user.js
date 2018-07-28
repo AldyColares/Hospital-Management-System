@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { genSalt, hash, compare } from 'bcrypt-nodejs';
+import bcrypt from 'bcrypt';
 import hashedPassword from '../safety/secretCrypt';
 import { isAlpha, isEmail, isAlphanumeric } from 'validator';
 import { sign } from 'jsonwebtoken';
@@ -76,37 +76,20 @@ let UserSchema = mongoose.Schema({
   creatAt: { type: Date, default: Date.now }
 });
 
-
-UserSchema.methods.checkPassword = function (guess, next) {
-  compare(guess, this.password, function (err, isMatch) {
-    if (err) { return next(err); }
-    if (isMatch) {
-      return isMatch;
-    }
-    return false;
+UserSchema.methods.checkPassword = function (guess, callback) {
+  bcrypt.compare(guess, this.password, function (err, isMatch) {
+    if (err) return callback(err);
+    return callback(null, isMatch);
   });
 };
 
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
-  let token = sign({ _id: user._id.toHexString(), role: user.role },
-    hashedPassword).toString();
+  let token = sign( { _id: user._id.toHexString(), role: user.role }, chashedPassword.toString());
   user.token = token;
 
   return user.save().then(() => {
     return token;
-  });
-};
-
-UserSchema.statics.findByCredentials = (user, loginPassword) => {
-  return new Promise((resolve, reject) => {
-    compare(loginPassword, user.password, (err, user) => {
-      if (user) {
-        resolve(res);
-      } else {
-        reject();
-      }
-    });
   });
 };
 
@@ -116,10 +99,10 @@ UserSchema.pre('save', function (done) {
   if (!user.isModified("password")) {
     return done();
   }
-  genSalt(SALT_FACTOR, (err, salt) => {
-    let progress = function () { };
-    hash(user.password, salt, progress, (err, hashedPassword) => {
-      if (err) { return done(err); }
+  bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
+    if (err) return done(err);
+    bcrypt.hash(user.password, salt, (err, hashedPassword) => {
+      if (err) return done(err);
       user.password = hashedPassword;
       done();
     });
@@ -137,7 +120,8 @@ let handleE11000 = function (error, doc, next) {
 UserSchema.post('save', handleE11000);
 UserSchema.post('update', handleE11000);
 UserSchema.post('findOneAndUpdate', handleE11000);
-Userschema.post('insertMany', handleE11000);
+UserSchema.post('insertMany', handleE11000);
 
 let User = mongoose.model('User', UserSchema);
+
 export default User;

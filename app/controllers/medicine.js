@@ -1,6 +1,5 @@
-import flashUser from '../models/flashUser';
 import Medicine from '../models/MongooseODM/medicine';
-import mongoose, { ObjectID } from 'mongodb';
+import { ObjectID } from 'mongodb';
 import mongoose from 'mongoose';
 import errorMiddleware from '../models/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -9,12 +8,10 @@ import pluck from '../util/pluck';
 let controllerRegister = {};
 
 controllerRegister.loadPageRegisterMedicine = function (req, res) {
-  flashUser(req, res);
   return res.render('registerMedicine');
 };
 
 controllerRegister.registerMedicine = function (req, res, next) {
-  flashUser(req, res);
   const body = req.body;
   let message = '';
   if (!body) {

@@ -5,9 +5,10 @@ import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../models/errorMiddleware';
-import sendJsonResponse from '../models/respondInFormatJSON';
+import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
+import { callbackify } from 'util';
 
 let userController = {}
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -19,7 +20,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 // **PENDENT** Creat the Token for each request for client login.
 userController.login = function (req, res) {
   flashUser(req, res);
-  res.render('login');
+  res.render('login').end();
 };
 
 /*
@@ -29,41 +30,43 @@ userController.login = function (req, res) {
 userController.loginPost = function (req, res, next) {
   let body = req.body, message = '';
   flashUser(req, res);
-
+  console.log(body.name);
   User.findOne({ name: body.name }, function (err, user) {
     if (err) return errorMiddleware(err, 500, next);
     if (!user) {
-      message = 'The email address ' + req.body.email +
-        ' is not associated with any account.' +
-        'Double-check your email address and try again.';
+      message = 'The login or password do not found.';
       return sendJsonResponse(res, 400, message, next);
     }
 
-    let resultCheckPassword = user.checkPassword(body.password, next);
-    if (resultCheckPassword) {
-      res.locals.currentUser = user.name;
+    user.checkPassword(body.password, function (err, resultCheckPassword){
+      if (err) return errorMiddleware(err, 500, next);
+      console.log(resultCheckPassword);
+      if(resultCheckPassword) {
+        res.locals.currentUser = user.name;
 
-      // save session the id and access
-      let credentialUser = _.pick(user, ['name', 'idLogin', 'role', 'token']);
+        // save session the id and access
+        let credentialUser = pluck(user, ['name', 'idLogin', 'role', 'token']);
 
-      req.session.user = credentialUser;
-      console.log('object session: ' + req.session);
+        req.session.user = credentialUser;
+        console.log('object session: ' + req.session);
 
-      res.status(200).render('main-page-user');
-    }
-    // the response for user will be with React.
-    res.status(400).message('the login or password are wrongs').render('login');
+        return res.status(200).render('main-page-user').end();
+      }
+      // the response for user will be with React.
+      return res.status(400).message('the login or password are wrongs').render('login').end();
+    });
+
   });
 };
 
 userController.logOut = function (req, res) {
   req.session = null;
-  res.redirect('/');
+  res.redirect('/').end();
 };
 
 userController.registerUser = function (req, res, next) {
   flashUser(req, res);
-  res.render('register-user');
+  res.render('register-user').end();
 };
 
 /*
@@ -95,7 +98,7 @@ userController.registerUserPost = function (req, res, next) {
     });
 
     user.save(function (err) {
-      if (err) { return res.status(500).send({ msg: err.message }); }
+      if (err) { return res.status(500).send({ msg: err.message }).end(); }
 
       let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
 
@@ -127,7 +130,7 @@ userController.registerUserPost = function (req, res, next) {
           setupSendEmail.next = next;
           sendEmailVericationUser(setupSendEmail);
         } else {
-          res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token });
+          res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token }).end();
         }
       });
     });
@@ -148,7 +151,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
       return res.status(400).send({
         type: 'not-verified',
         msg: 'We were unable to find a valid token. Your token my have expired.'
-      });
+      }).end();
     }
 
     // If found a token, find a matching user
@@ -156,24 +159,24 @@ userController.confirmationRegisterUser = function (req, res, next) {
       if (err) return errorMiddleware(err, 500, next);
       if (!user) return res.status(400).send(
         { msg: 'We were unable to find a user for this token.' }
-      );
+      ).end();
 
       if (user.isVerified) return res.status(400).send(
         {
           type: 'already-verified',
           msg: 'This user has already been verified.'
-        });
+        }).end();
 
       // Verify and save the user
       user.isVerified = true;
       user.idLogin = generateIdLogin(user.name);
       res.user = user.idLogin;
       user.save(function (err) {
-        if (err) { return res.status(500).send({ msg: err.message }); }
+        if (err) { return res.status(500).send({ msg: err.message }).end(); }
       });
       // The user going redirect for main page.
 
-      res.status(200).redirect('login');
+      res.status(200).redirect('login').end();
     });
   }
   );
@@ -182,12 +185,12 @@ userController.confirmationRegisterUser = function (req, res, next) {
 userController.resendTokenPost = function (req, res, next) {
 
   User.findOne({ email: req.body.email }, function (err, user) {
-    if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' });
+    if (!user) return res.status(400).send({ msg: 'We were unable to find a user with that email.' }).end();
 
     if (user.isVerified) return res.status(400).send({
       msg: 'This account has already been' +
         'verified. Please log in.'
-    });
+    }).end();
 
     let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
     // Create a verification token, save it, and send email
@@ -195,7 +198,7 @@ userController.resendTokenPost = function (req, res, next) {
 
     // Save the token
     token.save(function (err) {
-      if (err) { return res.status(500).send({ msg: err.message }); }
+      if (err) { return res.status(500).send({ msg: err.message }).end(); }
 
       let emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
         +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation\/'
@@ -236,9 +239,9 @@ userController.updateProfile = async function (req, res, next) {
     let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options);
     console.log(updated);
     if (!updatedUser) {
-      res.status(404).send()
+      res.status(404).send().end()
     } else {
-      res.status(200).redirect('update-profile');
+      res.status(200).redirect('update-profile').end();
 
     }
   } catch (err) {

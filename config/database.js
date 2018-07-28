@@ -38,7 +38,7 @@ export default function () {
     process.on('SIGINT', function () {
         mongoose.connection.close(function () {
             console.log('Mongoose! Disconnect from finish the application.');
-        // 0 indica que a finalização ocorreu sem erros
+        // zero show that a finalization occurred error, 0 indicates that finalization occurred without errors 0 indica que a finalização ocorreu sem erros
         process.exit(0);
         });
     });

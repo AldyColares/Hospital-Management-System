@@ -8,8 +8,7 @@
  */
 
 let respondInFormatJSON = (res, status, message, next) => {
-    res.status(status).type('json').json(message);
-    return next();
+    return res.status(status).type('json').json(message).end();
 } 
 
 export default respondInFormatJSON;
