@@ -4,7 +4,7 @@ import Token from '../models/MongooseODM/token';
 import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
-import errorMiddleware from '../models/errorMiddleware';
+import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
@@ -30,7 +30,6 @@ userController.login = function (req, res) {
 userController.loginPost = function (req, res, next) {
   let body = req.body, message = '';
   flashUser(req, res);
-  console.log(body.name);
   User.findOne({ name: body.name }, function (err, user) {
     if (err) return errorMiddleware(err, 500, next);
     if (!user) {
@@ -40,17 +39,16 @@ userController.loginPost = function (req, res, next) {
 
     user.checkPassword(body.password, function (err, resultCheckPassword){
       if (err) return errorMiddleware(err, 500, next);
-      console.log(resultCheckPassword);
       if(resultCheckPassword) {
         res.locals.currentUser = user.name;
 
         // save session the id and access
-        let credentialUser = pluck(user, ['name', 'idLogin', 'role', 'token']);
+        let credentialUser = pluck(user, 'name', 'idLogin', 'role', 'token');
 
         req.session.user = credentialUser;
-        console.log('object session: ' + req.session);
+        console.log( req.session);
 
-        return res.status(200).render('main-page-user').end();
+        return res.status(200).render('main-page-user');
       }
       // the response for user will be with React.
       return res.status(400).message('the login or password are wrongs').render('login').end();
@@ -84,7 +82,7 @@ userController.registerUserPost = function (req, res, next) {
     if (err) errorMiddleware(err, 500, next);
 
     // Make sure user doesn't already exist
-    if (user) errorMiddleware('The email address you have entered is already associated' +
+    if (user) errorMiddleware('The email address you have entered is already associated.' +
       'with another account.', 400, next);
 
     const body = req.body;

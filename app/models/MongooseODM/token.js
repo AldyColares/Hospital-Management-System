@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 
+let atributeToken = ['tokenSchema', 'token', 'createdAt'];
+
 const ONE_DAY = 43200;
 const tokenSchema = new mongoose.Schema({
   _userId: {

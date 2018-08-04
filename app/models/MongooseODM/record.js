@@ -1,32 +1,32 @@
 import { Schema, model } from 'mongoose';
 import npmValidate from 'validator';
 
+const listElements = ['patientId', 'recordNo', 'discription', 'appoinmest'];
+
 let recordSchema = Schema({
   patientId: {
     type: String,
-    required: true,
+    required: [true, 'Identification of patient is required.'],
     lowercare: true,
     trim: true
   },
   recordNo: {
     type: String,
-    required: true,
+    required: [true, 'Number of record is required.'],
     lowercare: true,
     trim: true
   },
   discription: {
     type: String,
-    require: true,
+    required: [true, 'discription is required.'],
     lowercare: true,
     trim: true,
-    required: [true, 'discription is required.']
   },
   appoinmest: {
     type: String,
-    require: true,
+    required: [true, 'appoinmest is required.'],
     lowercare: true,
     trim: true,
-    required: [true, 'appoinmest is required.']
   }
 });
 

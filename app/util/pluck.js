@@ -3,15 +3,13 @@
 /**
  * Pluck remove only properties of the object that need and return object them.
  * the first parameter is object and second is a array of name properties
- * @param  {object} 
- * @param  {array} 
- * @return {object}
+ * @param  {object} - The object for extract proprietys. 
+ * @param  {array}  - The list of name of properties of the object from the first parameter..
+ * @return {object} - 
  * @public
  */
-
 let pluck = (object, ...keys) => {
   let err;
-
   if (typeof object !== 'object') {
     err = new Error("Error: The first argument passed in must be a object");
     console.error(err.message + "\n" + err.stack);

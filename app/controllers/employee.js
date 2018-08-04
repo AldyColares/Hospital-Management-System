@@ -1,14 +1,13 @@
 import { Employee } from '../models/MongooseODM/employee';
 import { ObjectID } from 'mongodb';
-import mongoose from 'mongoose';
-import errorMiddleware from '../models/errorMiddleware';
+import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 
 let controllerEmployee = {};
 
 controllerEmployee.registerEmployee = function (req, res, next) {
-    const body = req.params;
+    const body = req.body;
     let message = '';
     if (!body) {
         message = 'you send empty fields';
@@ -18,9 +17,12 @@ controllerEmployee.registerEmployee = function (req, res, next) {
 
     Employee.findOne({ EID: body.EID }).exec()
         .then((Employee) => {
-            if (!Employee) return sendJsonResponse(res, 400, message, next);
+            if (!Employee) {
+                message = 'The Employer Identification you have entered is already associated.'
+                return sendJsonResponse(res, 400, message, next);
+            }
             let fileEmployee = pluck(body, ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
-                'history', 'ContactNumb'])
+                'history', 'ContactNumb']);
             let newEmployee = new Employee(fileEmployee);
             newEmployee.save(function (error, employee) {
                 if (error) return errorMiddleware(error, 500, next);
@@ -50,13 +52,13 @@ controllerEmployee.read = function (req, res, next) {
             message = { message: 'The name of employee do not exist.', success: false }
             sendJsonResponse(res, 403, message, next);
         }
-        message = { message: 'The list of result of employee.', success: true };
+        message = { message: 'The list of result of employee.', success: true, employee: listEmployee };
         sendJsonResponse(res, 200, message, next);
     });
 }
 /**
  * The update the date an Employee.
- * PUT /update-Employee/:id 
+ * PUT /update-employee/:id 
  */
 controllerEmployee.update = function (req, res, next) {
     if (!req.params.id || !req.body) {
@@ -65,11 +67,11 @@ controllerEmployee.update = function (req, res, next) {
     }
     const id = req.params.id, update = req.body,
         options = { new: true, runValidators: true };
-    if (!ObjectID.isValid(id)) return sendJsonResponse(res, 404, 'Not found id medicine', next);
+    if (!ObjectID.isValid(id)) return sendJsonResponse(res, 404, 'Not found id employee', next);
 
     // The example use Promise end Mongoose.
-    Medicine.findByIdAndUpdate(id, { $set: update }, options).then((docUpdated) => {
-        if (!docUpdated) return res.status(404).type('json').json({ message: 'Not found medicine.' });
+    Employee.findByIdAndUpdate(id, { $set: update }, options).then((docUpdated) => {
+        if (!docUpdated) return res.status(404).type('json').json({ message: 'Not found employee.' });
         return res.status(200).type('json').json(docUpdated);
 
     }).catch((err) => {
@@ -77,19 +79,23 @@ controllerEmployee.update = function (req, res, next) {
         errorMiddleware(err, 400, next);
     });
 }
+/** 
+* The delete the employee.
+* DELETE /delete-employee/:id
+*/
 controllerEmployee.delete = function (req, res, next) {
     const id = req.params.id;
-    if(!id && ObjectID.isValid(id)){
-      message = { message:'the indentification of employee do not found.', success: false }
-      return sendJsonResponse(res, 401, message, next);
+    if (!id && ObjectID.isValid(id)) {
+        message = { message: 'the indentification of employee do not found.', success: false }
+        return sendJsonResponse(res, 401, message, next);
     }
-    Medicine.deleteOne({ _id: id }, function (err) {
-      if (err) errorMiddleware(err, 500, next);
-      
-      message = { message: 'The employee successful deleted', success: true};
-      return sendJsonResponse(res, 200, message, next);
+    Employee.deleteOne({ _id: id }, function (err) {
+        if (err) errorMiddleware(err, 500, next);
+
+        message = { message: 'The employee successful deleted', success: true };
+        return sendJsonResponse(res, 200, message, next);
     });
-  }
+}
 
 // function null for nexting functionality, do not use it.
 controllerEmployee.null1 = function (req, res, next) { }

@@ -1,38 +1,42 @@
 import mongoose from 'mongoose';
-import { isEmpty, isDate } from 'validator';
-let pacientSchema = mongoose.Schema({
+import validator from 'validator';
+
+const atributesPacient = ['pid', 'name', 'gender',
+  'address', 'dateAdmited', 'dateDischarged', 'contactNo'];
+
+let patientSchema = mongoose.Schema({
   pid: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return !validator.isEmpty(v);
       },
       message: '',
     }
   },
   name: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return !validator.isEmpty(v);
       },
       message: '',
     }
   },
   gender: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return !validator.isEmpty(v);
       },
       message: '',
     }
@@ -40,44 +44,43 @@ let pacientSchema = mongoose.Schema({
   // must be city, street and zip
   address: {
     type: String,
-    require: true,
+    required: true,
     lowercare: true,
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return !validator.isEmpty(v);
       },
       message: ''
     }
   },
-  pDetailts: [{
-    dateAdmited: {
-      type: Date,
-      require: true,
-      validator: {
-        validator: (v) => {
-          return !isDate(v);
-        },
-        message: ''
-      }
-    },
-    dateDischarged: {
-      type: Date,
-      require: true,
-      validator: {
-        validator: (v) => {
-          return !isDate(v);
-        },
-        message: ''
-      }
-    }
-  }],
-  contactNo: {
-    type: String,
-    require: true,
+  dateAdmited: {
+    type: Date,
+    required: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return !validator.isDate(v);
+      },
+      message: ''
+    }
+  },
+  dateDischarged: {
+    type: Date,
+    required: true,
+    validator: {
+      validator: (v) => {
+        return !validator.isDate(v);
+      },
+      message: ''
+    }
+  }
+  ,
+  contactNo: {
+    type: String,
+    required: true,
+    validator: {
+      validator: (v) => {
+        return !validator.isEmpty(v);
       },
       message: ''
     }
@@ -97,5 +100,5 @@ pacientSchema.post('update', handleE11000);
 pacientSchema.post('findOneAndUpdate', handleE11000);
 pacientSchema.post('insertMany', handleE11000);
 
-let Pacient = mongoose.model('pacient', pacientSchema);
-export default Pacient;
+let Patient = mongoose.model('patient', pacientSchema);
+export default Patient;

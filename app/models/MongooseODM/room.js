@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { isEmpty } from 'validator';
 
+const atributesRoom = ['roomType', 'roomId', 'period'];
 let roomSchema = mongoose.Schema({
   roomType: {
     type: String,
@@ -14,8 +15,8 @@ let roomSchema = mongoose.Schema({
       message: 'the room of type do not empty.',
     }
   },
-  //roomId fist field is number, second field is floor hospital. Exemple: 11f2(number 11 of the 
-  //second floor).
+  /*roomId fist field is number, second field is floor hospital. Exemple: 11f2(number 11 of the 
+  second floor). */
   roomId: {
     type: String,
     unique: true,
@@ -29,6 +30,8 @@ let roomSchema = mongoose.Schema({
       message: 'the room of type do not empty.',
     }
   },
+  /* the period of patient will stay in the room. 
+  */
   period: {
     type: Date,
     require: true,

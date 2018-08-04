@@ -1,7 +1,7 @@
 import Medicine from '../models/MongooseODM/medicine';
 import { ObjectID } from 'mongodb';
 import mongoose from 'mongoose';
-import errorMiddleware from '../models/errorMiddleware';
+import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 
