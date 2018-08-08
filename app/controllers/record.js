@@ -11,10 +11,10 @@ controllerRecord.registerRecord = function (req, res, next) {
     const body = req.body,
         patientId = body.patientId;
     let message = '';
-    record.find({ patientId: patientId }).exec(function (err, record) {
+    Record.find({ patientId: patientId }).exec(function (err, record) {
         if (err) return errorMiddleware(err, 500, next);
 
-        if (record) {
+        if (record.length !== 0) {
             message = 'The patientId and address you have entered are already associated.'
             return sendJsonResponse(res, 400, )
         }

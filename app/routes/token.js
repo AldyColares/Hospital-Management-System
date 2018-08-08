@@ -6,7 +6,7 @@ export default function (app){
         
         app.get('/read-token', controllerToken.readtoken);
         
-        app.delete('/delete-token', controllerToken.delete);
+        app.delete('/delete-token/:id', controllerToken.delete);
         
         app.patch('/update-token/:id', controllerToken.update);
 }

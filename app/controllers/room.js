@@ -1,4 +1,4 @@
-import room from '../models/MongooseODM/room';
+import Room from '../models/MongooseODM/room';
 import { ObjectID } from 'mongodb';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -11,7 +11,7 @@ controllerRoom.registerRoom = function (req, res, next) {
     const body = req.body,
         roomId = body.roomId;
     let message = '';
-    room.find({ roomId: roomId }).exec(function (err, room) {
+    Room.find({ roomId: roomId }).exec(function (err, room) {
         if (err) return errorMiddleware(err, 500, next);
         if (room) {
             message = 'The identification room you have entered is already associated.'
@@ -39,7 +39,7 @@ controllerRoom.registerRoom = function (req, res, next) {
         };
         const name = req.params.name;
 
-        room.find({ name: name }, null, function (err, listroom) {
+        Room.find({ name: name }, null, function (err, listroom) {
             if (err) errorMiddleware(err, 500, next);
             if (!listroom) {
                 message = { message: 'The seach of room do not found.', success: false }
@@ -52,7 +52,7 @@ controllerRoom.registerRoom = function (req, res, next) {
     };
     /**
      * The update the room. 
-     * PUT /update-room/:idroom
+     * PUT /update-room/:id
      */
     controllerRoom.update = function (req, res, next) {
         if (!req.params.id || !req.body) {
@@ -64,7 +64,7 @@ controllerRoom.registerRoom = function (req, res, next) {
 
         // The example use Promise end Mongoose.
         const options = { new: true, runValidators: true };
-        room.findByIdAndUpdate(id, { $set: update }, options).then((docUpdated) => {
+        Room.findByIdAndUpdate({ roomId: id }, { $set: update }, options).then((docUpdated) => {
             if (!docUpdated) return res.status(404).type('json').json({ message: 'Not found room.' });
             return res.status(200).type('json').json(docUpdated);
 
@@ -75,9 +75,9 @@ controllerRoom.registerRoom = function (req, res, next) {
     };
 
     controllerRoom.delete = function (req, res, next) {
-        const id = req.params.roomId;
+        const roomId = req.params.id;
 
-        room.deleteOne({ roomId: roomId }, function (err) {
+        Room.deleteOne({ roomId: roomId }, function (err) {
             if (err) errorMiddleware(err, 500, next);
 
             message = { message: 'The room deleted successfuly.', success: true };

@@ -6,7 +6,7 @@ export default function (app){
         
         app.get('/read-employee', controllerEmployee.read);
         
-        app.delete('/delete-employee', controllerEmployee.delete);
+        app.delete('/delete-employee/:id', controllerEmployee.delete);
         
         app.patch('/update-employee/:id', controllerEmployee.update);
 }

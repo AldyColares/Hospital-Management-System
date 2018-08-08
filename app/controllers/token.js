@@ -25,7 +25,7 @@ controllerToken.registerToken = function (req, res, next) {
                 message = { message: 'Register successfully!', token: token };
                 return sendJsonResponse(res, 201, message, next);
             });
-        })    
+        })
 };
 
 /**
@@ -53,7 +53,7 @@ controllerToken.readtoken = function (req, res, next) {
 };
 /**
  * The update the token. 
- * PUT /update-token/:idtoken
+ * PUT /update-token/:id
  */
 controllerToken.update = function (req, res, next) {
     if (!req.params.id || !req.body) {
@@ -65,7 +65,7 @@ controllerToken.update = function (req, res, next) {
 
     // The example use Promise end Mongoose.
     const options = { new: true, runValidators: true };
-    Token.findByIdAndUpdate(id, { $set: update }, options).then((docUpdated) => {
+    Token.findByIdAndUpdate({ idToken: id }, { $set: update }, options).then((docUpdated) => {
         if (!docUpdated) return res.status(404).type('json').json({ message: 'Not found token.' });
         return res.status(200).type('json').json(docUpdated);
 
@@ -77,10 +77,10 @@ controllerToken.update = function (req, res, next) {
 
 /**
  * the delete the token
- * DELETE /delete-token/:token
+ * DELETE /delete-token/:id
  */
 controllerToken.delete = function (req, res, next) {
-    const token = req.params.token;
+    const token = req.params.id;
 
     Token.deleteOne({ token: token }, function (err) {
         if (err) errorMiddleware(err, 500, next);

@@ -9,9 +9,9 @@ export default function (app) {
   app.get('/register-user', user.registerUser)
   app.post('/register-user', user.registerUserPost);
 
-  app.put('/update-profile', user.updateProfile);
+  app.put('/update-profile/:id', user.updateProfile);
 
-  app.delete('/delete', user.deleteProfile);
+  app.delete('/delete-user/;id', user.deleteProfile);
 
   app.get('/confirmation-register-user', user.confirmationRegisterUser);
   app.post('/resend', user.resendTokenPost);

@@ -37,16 +37,16 @@ userController.loginPost = function (req, res, next) {
       return sendJsonResponse(res, 400, message, next);
     }
 
-    user.checkPassword(body.password, function (err, resultCheckPassword){
+    user.checkPassword(body.password, function (err, resultCheckPassword) {
       if (err) return errorMiddleware(err, 500, next);
-      if(resultCheckPassword) {
+      if (resultCheckPassword) {
         res.locals.currentUser = user.name;
 
         // save session the id and access
         let credentialUser = pluck(user, 'name', 'idLogin', 'role', 'token');
 
         req.session.user = credentialUser;
-        console.log( req.session);
+        console.log(req.session);
 
         return res.status(200).render('main-page-user');
       }
@@ -216,20 +216,27 @@ userController.resendTokenPost = function (req, res, next) {
 
   });
 };
-
-userController.deleteProfile = async function (req, res, next) {
-  const body = req.body,
-    idLoginUser = req.body.idLogin;
-  User.deleteOne({ idLogin: idLoginUser }, function (err) {
-    errorMiddleware(err, 500, next);
+/**
+ * the delete the user
+ * DELETE /delete-user/:id
+ */
+userController.deleteProfile = function (req, res, next) {
+  const id = req.params.id;
+  User.deleteOne({ idLogin: id }, function (err) {
+    if (err) return errorMiddleware(err, 500, next);
+    message = { message: 'The token deleted successfully.', success: true };
+    return sendJsonResponse(res, 200, message, next);
   });
 
 }
 
-
+/**
+ * the update the user
+ * PUT /update-user/:id
+ */
 userController.updateProfile = async function (req, res, next) {
   const body = req.body,
-    idLoginUser = req.body.idLogin,
+    idLoginUser = req.params.id,
     update = pluck(body, 'birth', 'age', 'gender'),
     options = { new: true, runValidators: true };
   delete req.body.idLogin;

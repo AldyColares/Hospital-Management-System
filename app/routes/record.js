@@ -5,7 +5,7 @@ export default function (app){
         
         app.get('/read-record', controllerRecord.readRecord);
         
-        app.delete('/delete-record', controllerRecord.delete);
+        app.delete('/delete-record/:id', controllerRecord.delete);
         
         app.patch('/update-record/:id', controllerRecord.update);
 }

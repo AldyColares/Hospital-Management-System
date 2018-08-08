@@ -6,7 +6,7 @@ export default function (app){
         
         app.get('/read-room', controllerroom.readroom);
         
-        app.delete('/delete-room', controllerroom.delete);
+        app.delete('/delete-room/:id', controllerroom.delete);
         
         app.patch('/update-room/:id', controllerroom.update);
 }

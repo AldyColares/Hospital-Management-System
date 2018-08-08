@@ -6,7 +6,7 @@ export default function (app) {
   
   app.get('/read-medicine', controllerMedicine.read);
   
-  app.delete('/delete-medicine', controllerMedicine.delete);
+  app.delete('/delete-medicine/:id', controllerMedicine.delete);
   
   app.patch('/update-medicine/:id', controllerMedicine.update);
   app.patch('/update-quantity-medicine/:id', controllerMedicine.incremOrDecremQauntityMedicine);
