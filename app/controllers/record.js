@@ -1,4 +1,4 @@
-import  Record  from '../models/MongooseODM/record';
+import Record from '../models/MongooseODM/record';
 import { ObjectID } from 'mongodb';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -11,23 +11,21 @@ controllerRecord.registerRecord = function (req, res, next) {
     const body = req.body,
         patientId = body.patientId;
     let message = '';
-    record.find({ patientId: patientId}).exec()
-        .then(record => {
-            if (record) {
-                message = 'The patientId and address you have entered are already associated.'
-                return sendJsonResponse(res, 400, )
-            }
-            let fileRecord = pluck(body, 'patientId', 'recordNo', 'discription', 'appoinmest');
-            const newRecord = new record(fileRecord);
-            newRecord.save(function (error, record) {
-                if (error) return errorMiddleware(error, 500, next);
-                message = { message: 'Register successfull!', record: record };
-                return sendJsonResponse(res, 201, message, next);
-            });
+    record.find({ patientId: patientId }).exec(function (err, record) {
+        if (err) return errorMiddleware(err, 500, next);
+
+        if (record) {
+            message = 'The patientId and address you have entered are already associated.'
+            return sendJsonResponse(res, 400, )
         }
-        ).catch(err => {
-            return errorMiddleware(err, 500, next);
+        let fileRecord = pluck(body, 'patientId', 'recordNo', 'discription', 'appoinmest');
+        const newRecord = new Record(fileRecord);
+        newRecord.save(function (error, record) {
+            if (error) return errorMiddleware(error, 500, next);
+            message = { message: 'Register successfull!', record: record };
+            return sendJsonResponse(res, 201, message, next);
         });
+    });
 };
 /**
  * The result of seach of record.

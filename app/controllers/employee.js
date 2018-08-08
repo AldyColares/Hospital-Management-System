@@ -1,4 +1,4 @@
-import  Employee  from '../models/MongooseODM/employee';
+import Employee from '../models/MongooseODM/employee';
 import { ObjectID } from 'mongodb';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -15,26 +15,26 @@ controllerEmployee.registerEmployee = function (req, res, next) {
     }
     Object.freeze(body);
 
-    Employee.findOne({ EID: body.EID }).exec()
-        .then((Employee) => {
-            if (!Employee) {
-                message = 'The Employer Identification you have entered is already associated.'
-                return sendJsonResponse(res, 400, message, next);
-            }
-            let fileEmployee = pluck(body, ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
-                'history', 'ContactNumb']);
-            let newEmployee = new Employee(fileEmployee);
-            newEmployee.save(function (error, employee) {
-                if (error) return errorMiddleware(error, 500, next);
-                
-                message = { message: 'Register successfull!', employee: employee }
-                return sendJsonResponse(res, 201, message, next);
-            });
-        }).catch(err => {
-            return errorMiddleware(err, 500, next);
-        });
-}
+    Employee.findOne({ EID: body.EID }).exec(function (err, employee) {
+        if (err) return errorMiddleware(err, 500, next);
+       
+        if (!employee) {
+            message = 'The Employer Identification you have entered is already associated.'
+            return sendJsonResponse(res, 400, message, next);
+        }
+        let fileEmployee = pluck(body, ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
+            'history', 'ContactNumb']);
+        let newEmployee = new Employee(fileEmployee);
+        newEmployee.save(function (error, employee) {
+            if (error) return errorMiddleware(error, 500, next);
 
+            message = { message: 'Register successfull!', employee: employee }
+            return sendJsonResponse(res, 201, message, next);
+        });
+
+    })
+
+};
 /**
  * GET  /search-employee/:Ename
  * the result of seach of client.

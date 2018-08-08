@@ -12,26 +12,25 @@ controllerPatient.registerPatient = function (req, res, next) {
         name = body.name,
         address = body.address;
     let message = '';
-    Patient.find({ name: name, address: address }).exec()
-        .then(patient => {
-            if (patient) {
-                message = 'The name and address you have entered are already associated.'
-                return sendJsonResponse(res, 400, )
-            }
-            let filePatient = pluck(body, 'pid', 'name', 'gender',
-                'address', 'dateAdmited', 'dateDischarged', 'contactNo');
-            const newPatient = new Patient(filePatient);
-            newPatient.save(function (error, patient) {
-                if (error) return errorMiddleware(error, 500, next);
-                message = { message: 'Register successfully!', patient: patient };
-                return sendJsonResponse(res, 201, message, next);
-            })
-        }
+    Patient.find({ name: name, address: address }).exec(function (err, patient) {
+        if (err) return errorMiddleware(err, 500, next);
 
-        ).catch(err => {
-            return errorMiddleware(err, 500, next);
+        if (patient) {
+            message = 'The name and address you have entered are already associated.'
+            return sendJsonResponse(res, 400, )
+        }
+        let filePatient = pluck(body, 'pid', 'name', 'gender',
+            'address', 'dateAdmited', 'dateDischarged', 'contactNo');
+        const newPatient = new Patient(filePatient);
+        newPatient.save(function (error, patient) {
+            if (error) return errorMiddleware(error, 500, next);
+            message = { message: 'Register successfully!', patient: patient };
+            return sendJsonResponse(res, 201, message, next);
         });
+    });
+
 };
+
 /**
  * The result of seach of patient.
  * GET  /search-patient/:name
