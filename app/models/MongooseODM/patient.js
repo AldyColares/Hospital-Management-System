@@ -3,7 +3,7 @@ import validator from 'validator';
 
 const atributesPacient = ['pid', 'name', 'gender',
   'address', 'dateAdmited', 'dateDischarged', 'contactNo'];
-
+   
 let patientSchema = mongoose.Schema({
   pid: {
     type: String,
@@ -95,10 +95,10 @@ let handleE11000 = function (error, doc, next) {
   }
 };
 
-pacientSchema.post('save', handleE11000);
-pacientSchema.post('update', handleE11000);
-pacientSchema.post('findOneAndUpdate', handleE11000);
-pacientSchema.post('insertMany', handleE11000);
+patientSchema.post('save', handleE11000);
+patientSchema.post('update', handleE11000);
+patientSchema.post('findOneAndUpdate', handleE11000);
+patientSchema.post('insertMany', handleE11000);
 
-let Patient = mongoose.model('patient', pacientSchema);
+let Patient = mongoose.model('patient', patientSchema);
 export default Patient;

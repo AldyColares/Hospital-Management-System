@@ -1,4 +1,4 @@
-import { Employee } from '../models/MongooseODM/employee';
+import  Employee  from '../models/MongooseODM/employee';
 import { ObjectID } from 'mongodb';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -26,6 +26,7 @@ controllerEmployee.registerEmployee = function (req, res, next) {
             let newEmployee = new Employee(fileEmployee);
             newEmployee.save(function (error, employee) {
                 if (error) return errorMiddleware(error, 500, next);
+                
                 message = { message: 'Register successfull!', employee: employee }
                 return sendJsonResponse(res, 201, message, next);
             });
@@ -97,5 +98,4 @@ controllerEmployee.delete = function (req, res, next) {
     });
 }
 
-// function null for nexting functionality, do not use it.
-controllerEmployee.null1 = function (req, res, next) { }
+export default controllerEmployee;

@@ -1,4 +1,4 @@
-import error404 from '../controllers/home';
+import error404 from '../controllers/error404';
 import  about  from '../controllers/about';
 
 export default function (app) {

@@ -20,8 +20,8 @@ controllerPatient.registerPatient = function (req, res, next) {
             }
             let filePatient = pluck(body, 'pid', 'name', 'gender',
                 'address', 'dateAdmited', 'dateDischarged', 'contactNo');
-            const patient = new Patient(filePatient);
-            patient.save(function (error, patient) {
+            const newPatient = new Patient(filePatient);
+            newPatient.save(function (error, patient) {
                 if (error) return errorMiddleware(error, 500, next);
                 message = { message: 'Register successfully!', patient: patient };
                 return sendJsonResponse(res, 201, message, next);
@@ -94,3 +94,5 @@ controllerPatient.delete = function (req, res, next) {
         return sendJsonResponse(res, 200, message, next);
     });
 };
+
+export default controllerPatient;

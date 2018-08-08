@@ -8,11 +8,7 @@ import session from 'cookie-session';
 import cookieParser from 'cookie-parser';
 import seed from '../app/util/seed';
 import connectBD from './database';
-import home from '../app/routes/home';
-import medicene from '../app/routes/medicine';
-import mainPageUser from '../app/routes/mainPageUser';
-import login from '../app/routes/user';
-import error from '../app/routes/handlingError';
+import allRouter from '../app/routes/allRoutes';
 
 const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
 
@@ -41,14 +37,12 @@ export default (function () {
     
     app.use(flash());
     app.use(bodyparse.urlencoded({ extended: false }));
-    
+    // imediatamente após a inicialização da sessão do Passport
+    //app.use(helmet.xframe());
     app.use(express.static('./public'));
     app.set('view engine', 'ejs');
     app.set('views', './app/views');
-    mainPageUser(app);
-    login(app);
-    medicene(app);
-    home(app);
-    error(app);
+    
+    allRouter(app);
     return app;
 })();

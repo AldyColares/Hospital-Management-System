@@ -57,6 +57,6 @@ roomSchema.post('update', handleE11000);
 roomSchema.post('findOneAndUpdate', handleE11000);
 roomSchema.post('insertMany', handleE11000);
 
-let Room = mongose.model('room', roomSchema);
+let Room = mongoose.model('room', roomSchema);
 export default { Room };
 

@@ -9,8 +9,6 @@ export default function (app) {
   app.get('/register-user', user.registerUser)
   app.post('/register-user', user.registerUserPost);
 
-
-  // POST vs PUT  vs PATCH do the same function. https://stackoverflow.com/questions/630453/put-vs-post-in-rest
   app.put('/update-profile', user.updateProfile);
 
   app.delete('/delete', user.deleteProfile);

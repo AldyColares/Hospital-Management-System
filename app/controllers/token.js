@@ -11,31 +11,30 @@ controllerToken.registerToken = function (req, res, next) {
     const body = req.body,
         tokenId = body.tokenId;
     let message = '';
-    token.find({ tokenId: tokenId }).exec()
-        .then(token => {
+    Token.findOne({ tokenId: tokenId })
+        .exec(function (err, token) {
+            if (err) return errorMiddleware(err, 500, next);
             if (token) {
-                message = 'The token you have entered is already associated.'
-                return sendJsonResponse(res, 400, )
+                message = { message: 'The token you have entered is already associated.', token: token }
+                return sendJsonResponse(res, 400, message);
             }
             let filetoken = pluck(body, 'tokenType', 'tokenId', 'period');
-            const token = new token(filetoken);
-            token.save(function (error, token) {
+            const newToken = new Token(filetoken);
+            newToken.save(function (error, token) {
                 if (error) return errorMiddleware(error, 500, next);
                 message = { message: 'Register successfully!', token: token };
                 return sendJsonResponse(res, 201, message, next);
             });
-        }
-        ).catch(err => {
-            return errorMiddleware(err, 500, next);
-        });
+        })    
 };
 
 /**
  * The result of seach of token.
  * GET  /search-token/:name
  */
-controllertoken.readtoken = function (req, res, next) {
+controllerToken.readtoken = function (req, res, next) {
     if (req.params.name) {
+
         message = { 'message': 'The identification of token field of token do not found', success: false };
         return sendJsonResponse(res, 400, message, next);
     };
@@ -56,7 +55,7 @@ controllertoken.readtoken = function (req, res, next) {
  * The update the token. 
  * PUT /update-token/:idtoken
  */
-controllertoken.update = function (req, res, next) {
+controllerToken.update = function (req, res, next) {
     if (!req.params.id || !req.body) {
         message = { message: 'The identification or date will update do not send.' }
         return sendJsonResponse(res, 400, message, next);
@@ -80,7 +79,7 @@ controllertoken.update = function (req, res, next) {
  * the delete the token
  * DELETE /delete-token/:token
  */
-controllertoken.delete = function (req, res, next) {
+controllerToken.delete = function (req, res, next) {
     const token = req.params.token;
 
     Token.deleteOne({ token: token }, function (err) {
@@ -91,5 +90,4 @@ controllertoken.delete = function (req, res, next) {
     });
 };
 
-
-
+export default controllerToken;

@@ -1,8 +1,8 @@
-const mongoose = require('mongoose'),
-  npmValidator = require('validator'),
-  nameFieldDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
-    'history', 'ContactNumb'],
+import mongoose from 'mongoose';
+import npmValidator from 'validator';
 
+const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
+  'history', 'ContactNumb'],
   employeeSchema = mongoose.Schema({
     // Employee Identification
     EID: {
@@ -22,8 +22,8 @@ const mongoose = require('mongoose'),
       require: true,
       get: v => Math.round(v),
       set: v => Math.round(v),
-      min: [5, 'the salary much less.'],
-      max: [7, 'the salary much high.'],
+      min: [5000, 'the salary much less.'],
+      max: [7000, 'the salary much high.'],
       validate: {
         validator: (v) => {
           return typeof v === 'number';
@@ -96,13 +96,20 @@ const mongoose = require('mongoose'),
   }
   );
 
-  schema.post('save', function(error, doc, next) {
-    if (error.name === 'MongoError' && error.code === 11000) {
-      next(new Error('There was a duplicate key error'));
-    } else {
-      next(error);
-    }
-  });
+
+let handleE11000 = function (error, doc, next) {
+  if (error.name === 'MongoError' && error.code === 11000) {
+    next(new Error('File duplication error in database.'));
+  } else {
+    next(error);
+  }
+};
+
+employeeSchema.post('save', handleE11000);
+employeeSchema.post('update', handleE11000);
+employeeSchema.post('findOneAndUpdate', handleE11000);
+employeeSchema.post('insertMany', handleE11000);
 
 const Employee = mongoose.model('employee', employeeSchema);
-module.exports = { Employee, nameFieldDocuments };
+
+export default {Employee , fieldNameDocuments};

@@ -1,4 +1,4 @@
-import  Room  from '../models/MongooseODM/room';
+import  room  from '../models/MongooseODM/room';
 import { ObjectID } from 'mongodb';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
@@ -18,8 +18,8 @@ controllerRoom.registerRoom = function (req, res, next) {
                 return sendJsonResponse(res, 400, )
             }
             let fileroom = pluck(body, 'roomType', 'roomId', 'period');
-            const room = new room(fileroom);
-            room.save(function (error, room) {
+            const newRoom = new room(fileroom);
+            newRoom.save(function (error, room) {
                 if (error) return errorMiddleware(error, 500, next);
                 message = { message: 'Register successfuly!', room: room };
                 return sendJsonResponse(res, 201, message, next);
@@ -34,7 +34,7 @@ controllerRoom.registerRoom = function (req, res, next) {
  * The result of seach of room.
  * GET  /search-room/:name
  */
-controllerroom.readroom = function (req, res, next) {
+controllerRoom.readroom = function (req, res, next) {
     if (req.params.name) {
         message = { 'message': 'The identification of room field of room do not found', success: false };
         return sendJsonResponse(res, 400, message, next);
@@ -56,7 +56,7 @@ controllerroom.readroom = function (req, res, next) {
  * The update the room. 
  * PUT /update-room/:idroom
  */
-controllerroom.update = function (req, res, next) {
+controllerRoom.update = function (req, res, next) {
     if (!req.params.id || !req.body) {
         message = { message: 'The identification or date will update do not send.' }
         return sendJsonResponse(res, 400, message, next);
@@ -76,7 +76,7 @@ controllerroom.update = function (req, res, next) {
     });
 };
 
-controllerroom.delete = function (req, res, next) {
+controllerRoom.delete = function (req, res, next) {
     const id = req.params.roomId;
    
     room.deleteOne({ roomId: roomId }, function (err) {
@@ -87,4 +87,4 @@ controllerroom.delete = function (req, res, next) {
     });
 };
 
-
+export default controllerRoom

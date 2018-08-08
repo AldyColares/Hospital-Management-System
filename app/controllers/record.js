@@ -9,8 +9,7 @@ const controllerRecord = {};
 // Function null for nexting functionality, do not use it.
 controllerRecord.registerRecord = function (req, res, next) {
     const body = req.body,
-        patientId = body.patientId,
-        address = body.address;
+        patientId = body.patientId;
     let message = '';
     record.find({ patientId: patientId}).exec()
         .then(record => {
@@ -18,31 +17,30 @@ controllerRecord.registerRecord = function (req, res, next) {
                 message = 'The patientId and address you have entered are already associated.'
                 return sendJsonResponse(res, 400, )
             }
-            let filerecord = pluck(body, 'patientId', 'recordNo', 'discription', 'appoinmest');
-            const record = new record(filerecord);
-            record.save(function (error, record) {
+            let fileRecord = pluck(body, 'patientId', 'recordNo', 'discription', 'appoinmest');
+            const newRecord = new record(fileRecord);
+            newRecord.save(function (error, record) {
                 if (error) return errorMiddleware(error, 500, next);
                 message = { message: 'Register successfull!', record: record };
                 return sendJsonResponse(res, 201, message, next);
             });
         }
-
         ).catch(err => {
             return errorMiddleware(err, 500, next);
         });
 };
 /**
  * The result of seach of record.
- * GET  /search-record/:name
+ * GET  /search-record/:patientId
  */
-controllerrecord.readrecord = function (req, res, next) {
-    if (req.params.name) {
-        message = { 'message': 'The name field of record do not found', success: false };
+controllerRecord.readRecord = function (req, res, next) {
+    if (req.params.patientId) {
+        message = { 'message': 'The patientId field of record do not found', success: false };
         return sendJsonResponse(res, 400, message, next);
     };
-    const name = req.params.name;
+    const patientId = req.params.patientId;
 
-    Record.find({ name: name }, null, function (err, listrecord) {
+    Record.find({ patientId: patientId }, null, function (err, listrecord) {
         if (err) errorMiddleware(err, 500, next);
         if (!listrecord) {
             message = { message: 'The seach of record do not found.', success: false }
@@ -57,7 +55,7 @@ controllerrecord.readrecord = function (req, res, next) {
  * The update the record. 
  * PUT /update-record/:id
  */
-controllerrecord.update = function (req, res, next) {
+controllerRecord.update = function (req, res, next) {
     if (!req.params.id || !req.body) {
         message = { message: 'The identification or date will update do not send.' }
         return sendJsonResponse(res, 400, message, next);
@@ -77,7 +75,7 @@ controllerrecord.update = function (req, res, next) {
     });
 };
 
-controllerrecord.delete = function (req, res, next) {
+controllerRecord.delete = function (req, res, next) {
     const id = req.params.id;
     if (!id && ObjectID.isValid(id)) {
         message = { message: 'the indentification of record do not found.', success: false }
@@ -91,3 +89,4 @@ controllerrecord.delete = function (req, res, next) {
     });
 };
 
+export default controllerRecord;

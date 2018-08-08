@@ -1,8 +1,6 @@
-import flashUser from '../models/flashUser';
 
-let mainPageUser = { };
+const mainPageUser = {};
 mainPageUser.pageUser = function (req, res, next) {
-  flashUser(req, res);
   res.render('main-page-user');
 }
 

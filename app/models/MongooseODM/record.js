@@ -1,9 +1,9 @@
-import { Schema, model } from 'mongoose';
+import mongoose from 'mongoose';
 import npmValidate from 'validator';
 
 const listElements = ['patientId', 'recordNo', 'discription', 'appoinmest'];
 
-let recordSchema = Schema({
+let recordSchema = mongoose.Schema({
   patientId: {
     type: String,
     required: [true, 'Identification of patient is required.'],
@@ -43,6 +43,6 @@ recordSchema.post('update', handleE11000);
 recordSchema.post('findOneAndUpdate', handleE11000);
 recordSchema.post('insertMany', handleE11000);
 
-let Record = model('record', recordSchema);
+let Record = mongoose.model('record', recordSchema);
 export default Record;
 
