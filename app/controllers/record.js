@@ -83,7 +83,7 @@ controllerRecord.delete = function (req, res, next) {
         if (err) errorMiddleware(err, 500, next);
 
         message = { message: 'The record deleted successful.', success: true };
-        return sendJsonResponse(res, 200, message, next);
+        return sendJsonResponse(res, 204, message, next);
     });
 };
 

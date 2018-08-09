@@ -8,7 +8,6 @@ import errorMiddleware from '../middleware/errorMiddleware';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
-import { callbackify } from 'util';
 
 let userController = {}
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -43,15 +42,16 @@ userController.loginPost = function (req, res, next) {
         res.locals.currentUser = user.name;
 
         // save session the id and access
-        let credentialUser = pluck(user, 'name', 'idLogin', 'role', 'token');
-
-        req.session.user = credentialUser;
-        console.log(req.session);
-
-        return res.status(200).render('main-page-user');
+        pluck(user, ['name', 'idLogin', 'role', 'token'], function (err, credentialUser) {
+          if (err) return errorMiddleware(err, 400, next);
+          req.session.user = credentialUser;
+          return res.status(200).render('main-page-user');
+        });
+      } else {
+        // the response for user will be with React.
+        return res.status(400).message('the login or password are wrongs').render('login').end();
       }
-      // the response for user will be with React.
-      return res.status(400).message('the login or password are wrongs').render('login').end();
+
     });
 
   });
@@ -78,6 +78,7 @@ userController.registerUserPost = function (req, res, next) {
     if (err) errorMiddleware('the terms of services do not was applay', 428, next);
   }
   // Make sure this account doesn't already exist
+  // ** The beauty callback hell ** I am will resolve .
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) errorMiddleware(err, 500, next);
 
@@ -88,11 +89,47 @@ userController.registerUserPost = function (req, res, next) {
     const body = req.body;
     Object.freeze(body);
     // Create model object and save the user.
-    let fileUser = pluck(body, 'name', 'password', 'email', 'job', 'phone');
-    user = new User(fileUser);
+    pluck(body, ['name', 'password', 'email', 'job', 'phone'], function (err, fileUser) {
+      if (err) return errorMiddleware(err, 400, next);
+      user = new User(fileUser);
+      user.validate(function (err) {
+        if (err) errorMiddleware(err, 428, next);
+      });
+      user.save(function (err) {
+        if (err) return res.status(500).send({ msg: err.message }).end();
+        let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
+        // Create a verification token for this user.
+        let token = new Token({ _userId: user._id, token: tokenUserId });
 
-    user.validate(function (err) {
-      if (err) errorMiddleware(err, 428, next);
+        // Save date base of the verification token.
+        token.save(function (err) {
+          if (err) errorMiddleware(err, 500, next);
+
+          // note: I still can not test with verication send email. 
+          if (NODE_ENV !== 'test') {
+            const setupSendEmail = {},
+              emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
+                +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation-register-user\/'
+                + token.token + '.\n';
+
+            setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
+              setup.mailOptions.to + '.';
+
+            setupSendEmail.mailOptions = {
+              from: 'no-reply@yourwebapplication.com',
+              to: user.email,
+              subject: 'Account Verification Token',
+              text: emailText
+            };
+
+            setupSendEmail.res = res;
+            setupSendEmail.next = next;
+            sendEmailVericationUser(setupSendEmail);
+          } else {
+            res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token }).end();
+          }
+        });
+      });
     });
 
     user.save(function (err) {
@@ -225,7 +262,7 @@ userController.deleteProfile = function (req, res, next) {
   User.deleteOne({ idLogin: id }, function (err) {
     if (err) return errorMiddleware(err, 500, next);
     message = { message: 'The token deleted successfully.', success: true };
-    return sendJsonResponse(res, 200, message, next);
+    return sendJsonResponse(res, 204, message, next);
   });
 
 }

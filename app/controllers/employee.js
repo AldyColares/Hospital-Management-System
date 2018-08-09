@@ -17,21 +17,22 @@ controllerEmployee.registerEmployee = function (req, res, next) {
 
     Employee.findOne({ EID: body.EID }).exec(function (err, employee) {
         if (err) return errorMiddleware(err, 500, next);
-       
+
         if (!employee) {
             message = 'The Employer Identification you have entered is already associated.'
             return sendJsonResponse(res, 400, message, next);
         }
-        let fileEmployee = pluck(body, ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
-            'history', 'ContactNumb']);
-        let newEmployee = new Employee(fileEmployee);
-        newEmployee.save(function (error, employee) {
-            if (error) return errorMiddleware(error, 500, next);
+        pluck(body, ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
+            'history', 'ContactNumb'], function (err, fileEmployee) {
+                if (err) return errorMiddleware(err, 400, next);
+                let newEmployee = new Employee(fileEmployee);
 
-            message = { message: 'Register successfull!', employee: employee }
-            return sendJsonResponse(res, 201, message, next);
-        });
-
+                newEmployee.save(function (error, employee) {
+                    if (error) return errorMiddleware(error, 500, next);
+                    message = { message: 'Register successfull!', employee: employee }
+                    return sendJsonResponse(res, 201, message, next);
+                });
+            });
     })
 
 };
@@ -94,7 +95,7 @@ controllerEmployee.delete = function (req, res, next) {
         if (err) errorMiddleware(err, 500, next);
 
         message = { message: 'The employee successful deleted', success: true };
-        return sendJsonResponse(res, 200, message, next);
+        return sendJsonResponse(res, 204, message, next);
     });
 }
 

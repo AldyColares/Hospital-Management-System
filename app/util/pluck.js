@@ -1,36 +1,42 @@
 /*jshint esversion: 6 */
+import stringReplaceAt from './stringReplaceAt';
 
 /**
  * Pluck remove only properties of the object that need and return object them.
  * the first parameter is object and second is a array of name properties
- * @param  {object} - The object for extract proprietys. 
- * @param  {array}  - The list of name of properties of the object from the first parameter..
- * @return {object} - 
- * @public
+ * @param  {object} Object - The object for extract proprietys. 
+ * @param  {array}  keys - The list of name of properties of the object from the first parameter.
+ * @param  {callback} callback - The asynchronous function return error or object.    
  */
-let pluck = (object, ...keys) => {
+
+let pluck = (object, keys, callback) => {
   let err;
+  if (!(typeof callback === 'function')) {
+    err = new Error('Error: The third argument shoud be callback.')
+    return
+  }
   if (typeof object !== 'object') {
-    err = new Error("Error: The first argument passed in must be a object");
-    console.error(err.message + "\n" + err.stack);
-    throw err;
+    err = new Error('Error: The first argument passed in must be a object');
+    return callback(err, null);
   }
-  if (keys === undefined || !(typeof keys !== 'string')) {
-    err = new Error("Error: The second argument passed in must be a string or array string");
-    console.error(err.message + "\n" + err.stack);
-    throw err;
+  if (!keys || !Array.isArray(keys)) {
+    err = new Error('Error: The second argument passed in must be array of string');
+    return callback(err, null);
   }
-  const newObject = {};
+  const newObject = {}, listError = '';
   keys.forEach(key => {
     newObject[key] = object[key];
     if (!object[key]) {
-      //err = new Error(`Error: The object passed not have properties ${key} \n ${object}`);
-      //console.error(err.message + "\n" + err.stack);
-      delete newObject[key];
+      if(!listError) listError = listError.concat('The user input not have: ');
+      listError = listError.concat(`${key},`);
     }
   });
-
-  return newObject;
+  if (listError) {
+    listError = stringReplaceAt(listError, listError.length - 1, '.');
+    err = new Error(listError);
+    return callback(err, null);
+  }
+  return callback(null, newObject);
 };
 
-export default pluck ;
+export default pluck;

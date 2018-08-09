@@ -31,15 +31,17 @@ controllerRegister.registerMedicine = function (req, res, next) {
       error.status = 400;
       return next(error);
     }
-    let fileMedicine = pluck(body, 'name', 'batch', 'quantity', 'expiration', 'prize');
-    let newMedicine = new Medicine(fileMedicine);
-    newMedicine.save(function (error, employee) {
-      if (error) return errorMiddleware(error, 500, next);
-      message = { message: 'Register successfull!', employee: employee }
-      return sendJsonResponse(res, 201, message, next);
+    let fileMedicine = pluck(body, ['name', 'batch', 'quantity', 'expiration', 'prize'], function(err, fileMedicine){
+      if (err) return errorMiddleware(res, 400, next);
+      
+      let newMedicine = new Medicine(fileMedicine);
+      newMedicine.save(function (error, employee) {
+        if (error) return errorMiddleware(error, 500, next);
+        
+        message = { message: 'Register successfull!', employee: employee }
+        return sendJsonResponse(res, 201, message, next);
+      });
     });
-    req.flash('info', `The of code medicine: ${req.body.code} registered successful`);
-    return res.redirect('/registerMedicene');
   });
 }
 
@@ -151,7 +153,7 @@ controllerRegister.delete = function (req, res, next) {
     if (err) errorMiddleware(err, 500, next);
 
     message = { message: 'The medicine successful deleted', success: true};
-    return sendJsonResponse(res, 200, message, next);
+    return sendJsonResponse(res, 204, message, next);
   });
 }
 

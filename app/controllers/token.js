@@ -18,12 +18,15 @@ controllerToken.registerToken = function (req, res, next) {
                 message = { message: 'The token you have entered is already associated.', token: token }
                 return sendJsonResponse(res, 400, message);
             }
-            let filetoken = pluck(body, 'tokenType', 'tokenId', 'period');
-            const newToken = new Token(filetoken);
-            newToken.save(function (error, token) {
-                if (error) return errorMiddleware(error, 500, next);
-                message = { message: 'Register successfully!', token: token };
-                return sendJsonResponse(res, 201, message, next);
+            pluck(body, ['tokenType', 'tokenId', 'period'], function(err, fileToken){
+                if (err) return errorMiddleware(err, 400, next);
+                
+                const newToken = new Token(filetoken);
+                newToken.save(function (err, token) {
+                    if (err) return errorMiddleware(err, 500, next);
+                    message = { message: 'Register successfully!', token: token };
+                    return sendJsonResponse(res, 201, message, next);
+                });
             });
         })
 };
@@ -86,7 +89,7 @@ controllerToken.delete = function (req, res, next) {
         if (err) errorMiddleware(err, 500, next);
 
         message = { message: 'The token deleted successfully.', success: true };
-        return sendJsonResponse(res, 200, message, next);
+        return sendJsonResponse(res, 204, message, next);
     });
 };
 

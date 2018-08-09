@@ -4,7 +4,7 @@ import hashedPassword from '../safety/secretCrypt';
 import { isAlpha, isEmail, isAlphanumeric } from 'validator';
 import { sign } from 'jsonwebtoken';
 
-const SALT_FACTOR = 10;
+const SALT_FACTOR = 12;
 let UserSchema = mongoose.Schema({
   name: {
     type: String,
@@ -85,7 +85,7 @@ UserSchema.methods.checkPassword = function (guess, callback) {
 
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
-  let token = sign( { _id: user._id.toHexString(), role: user.role }, chashedPassword.toString());
+  let token = sign({ _id: user._id.toHexString(), role: user.role }, chashedPassword.toString());
   user.token = token;
 
   return user.save().then(() => {
@@ -101,7 +101,7 @@ UserSchema.pre('save', function (done) {
   }
   bcrypt.genSalt(SALT_FACTOR, (err, salt) => {
     if (err) return done(err);
-    bcrypt.hash(user.password, salt, (err, hashedPassword) => {
+    bcrypt.hash(user.password, salt, function (err, hashedPassword) {
       if (err) return done(err);
       user.password = hashedPassword;
       done();
