@@ -8,6 +8,11 @@ const statusCode = {
     success = {
         ok: 200
     },
+    redirection = {
+       movedPermanently: 301,    
+       TemporaryRedirect: 307,
+       PermanentREdirec: 308,
+    },
     clientError = {
         badrequest: 400,
         unauthorized: 401,

@@ -5,6 +5,7 @@ import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
 import sendEmailVericationUser from '../models/centralInformationModel';
 import errorMiddleware from '../middleware/errorMiddleware';
+import sendNewPage from '../middleware/sendNewPage';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
@@ -16,7 +17,7 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
  * GET /login
  * Just for render of page login and in the future identification Token.
  */
-// **PENDENT** Creat the Token for each request for client login.
+// **PENDENT** Create the Token for each request for client login.
 userController.login = function (req, res) {
   flashUser(req, res);
   res.render('login').end();
@@ -45,11 +46,11 @@ userController.loginPost = function (req, res, next) {
         pluck(user, ['name', 'idLogin', 'role', 'token'], function (err, credentialUser) {
           if (err) return errorMiddleware(err, 400, next);
           req.session.user = credentialUser;
-          return res.status(200).render('main-page-user');
+          return sendNewPage(res, 200, 'main-page-user');
         });
       } else {
         // the response for user will be with React.
-        return res.status(400).message('the login or password are wrongs').render('login').end();
+        return sendJsonResponse(res, 400, 'The error login or password', next);
       }
 
     });
