@@ -31,10 +31,11 @@ let recordSchema = mongoose.Schema({
 });
 
 let handleE11000 = function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.code === 11000) {
     next(new Error('File duplication error in database.'));
   } else {
-    next(error);
+    let err = new Error(error.message);
+    next(err);
   }
 };
 

@@ -23,12 +23,13 @@ let pluck = (object, keys, callback) => {
     err = new Error('Error: The second argument passed in must be array of string');
     return callback(err, null);
   }
-  const newObject = {}, listError = '';
+  const newObject = {}; 
+  let listError = '';
   keys.forEach(key => {
     newObject[key] = object[key];
     if (!object[key]) {
-      if(!listError) listError = listError.concat('The user input not have: ');
-      listError = listError.concat(`${key},`);
+      if(!listError) listError = listError.concat('The user input not have:');
+      listError = listError.concat(` ${key},`);
     }
   });
   if (listError) {

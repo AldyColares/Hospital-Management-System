@@ -26,4 +26,5 @@ export default function(app) {
     token(app);
     error404(app);
     handlingError(app);
+    error404(app);
  };

@@ -5,11 +5,12 @@ let MedicineSchema = mongoose.Schema({
   name: {
     type: String,
     required: true,
+    trim: true,
     validate: {
       validator: (v) => {
-        return;
+        return validator.isAlpha(v);
       },
-      message: 'The {VALUE} can not by empty'
+      message: 'The medicine name can not by empty.'
     }
   },
   // Serial of fabric of the drug. It should be required fecht for the validity of the remedies.
@@ -21,7 +22,7 @@ let MedicineSchema = mongoose.Schema({
       validator: (v) => {
         return validator.isAlphanumeric(v);
       },
-      message: 'The {VALUE} can not by empty'
+      message: 'The batch can not by empty'
     }
   },
   quantity: {
@@ -29,23 +30,20 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        if ( v >= 0) {
-          return true;
-        }
-        return false;
+        return parseInt(v) >= 0;
       },
       message: 'The {VALUE} can by natural number.'
     }
   },
-  // the validity of the remedy.
+  // The validity of the remedy.
   expiration: {
     type: Date,
     required: true,
     validate: {
       validator: (v) => {
-        return true;
+        return validator.toDate(v);
       },
-      message: ''
+      message: 'the {VALUE} must be format number '
     }
   },
 
@@ -73,10 +71,11 @@ let MedicineSchema = mongoose.Schema({
 });
 
 let handleE11000 = function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.code === 11000) {
     next(new Error('File duplication error in database.'));
   } else {
-    next(error);
+    let err = new Error(error.message);
+    next(err);
   }
 };
 

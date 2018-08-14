@@ -22,12 +22,14 @@ const tokenSchema = new mongoose.Schema({
 // If is duplication of error.
 
 let handleE11000 = function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
-    next(new Error('Date duplication error in database.'));
+  if (error.code === 11000) {
+    next(new Error('File duplication error in database.'));
   } else {
-    next(error);
+    let err = new Error(error.message);
+    next(err);
   }
 };
+
 tokenSchema.post('save', handleE11000);
 tokenSchema.post('update', handleE11000);
 tokenSchema.post('findOneAndUpdate', handleE11000);

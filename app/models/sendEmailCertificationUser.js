@@ -1,6 +1,6 @@
 import { createTransport } from 'nodemailer';
-import { sendEmailUserAndPassword, } from './centralInformationModel';
-import errorMiddleware from './errorMiddleware';
+import sendEmailUserAndPassword from './centralInformationModel';
+import errorMiddleware from '../middleware/errorMiddleware';
 
 // Setup of send the email
 let sendemail = (setup) => {
@@ -13,9 +13,8 @@ let sendemail = (setup) => {
             pass: sendEmailUserAndPassword.password  // generated ethereal password
         }
     });
-
     transporter.sendMail(setup.mailOptions, function (err) {
-        if (err) errorMiddleware(err.message, 500, next);
+        if (err) errorMiddleware(err, 500, next);
         setup.res.status(200).send(setup.messageFromUser);
     });
 }

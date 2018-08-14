@@ -9,7 +9,8 @@ const statusCode = {
         ok: 200
     },
     redirection = {
-       movedPermanently: 301,    
+       movedPermanently: 301,
+       seeOther: 303,    
        TemporaryRedirect: 307,
        PermanentREdirec: 308,
     },

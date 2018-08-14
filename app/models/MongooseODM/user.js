@@ -25,9 +25,9 @@ let UserSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: function (v) {
-        return isAlphanumeric(v);
+        return isAlphanumeric(v) && v.length > 8;
       },
-      message: 'The size of the password {Value} must has between 8 and 20.' +
+      message: 'The size of the your password {VALUE} must has between 8 and 20.' +
         'It must has combine of letters, number and special characters.'
     }
   },
@@ -41,7 +41,7 @@ let UserSchema = mongoose.Schema({
       validator: function (v) {
         return isEmail(v);
       },
-      message: 'the {VALUE} is not email valide address! Use "exemple@gmail.com" as model.'
+      message: 'the {VALUE} is not email valide address! Use as model: exemple@gmail.com.'
     }
   },
   idLogin: {
@@ -51,12 +51,10 @@ let UserSchema = mongoose.Schema({
   },
   role: {
     type: String,
-    required: true,
     trim: true
   },
   token: {
     type: String,
-    required: true,
     trim: true
   },
   job: {
@@ -110,10 +108,11 @@ UserSchema.pre('save', function (done) {
 });
 
 let handleE11000 = function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.code === 11000) {
     next(new Error('File duplication error in database.'));
   } else {
-    next(error);
+    let err = new Error(error.message);
+    next(err);
   }
 };
 

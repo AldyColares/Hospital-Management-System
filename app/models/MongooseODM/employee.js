@@ -7,90 +7,93 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
     // Employee Identification
     EID: {
       type: String,
-      require: true,
+      required: [true, 'The indentification of Employee is necessary.'],
       trim: true,
       unique: true,
       validate: {
         validator: (v) => {
-          return npmValidator.isAlphanumeric;
+          return npmValidator.isAlphanumeric(v);
         }
       },
-      message: 'ID of Employer must be Alphanumeric'
+      message: 'ID of Employer must be Alpha and/or numeric.'
     },
     Salary: {
       type: Number,
-      require: true,
+      required: true,
       get: v => Math.round(v),
       set: v => Math.round(v),
       min: [5000, 'the salary much less.'],
       max: [7000, 'the salary much high.'],
       validate: {
         validator: (v) => {
-          return typeof v === 'number';
+          return validator.isNumeric(v);
         }
       },
       message: 'the salary {VALUE} must be number'
     },
     EAddress: {
       type: String,
-      require: true,
+      required: true,
       validate: {
         validator: (v) => {
-          return true;
+          return typeof v === 'string';
         }
       }
     },
     gender: {
       type: String,
-      require: true,
+      required: true,
       trim: true,
       validate: {
         validator: (v) => {
           return (v === 'male' || v === 'famale');
         },
-        message: ' the name of field gender must has "male" or "famele".'
+        message: 'The name of field gender must has "male" or "famele".'
       }
     },
     NID: {
       type: String,
-      require: true,
+      required: true,
       trim: true,
       unique: true,
       validate: {
         validator: (v) => {
-          return true;
+          return validator.isAlphanumeric(v);
         }
-      }
+      },
+      message: 'the indentification of user of Employer must be Alpha and/or numeric.'
     },
     EName: {
       type: String,
-      require: true,
+      required: true,
       trim: true,
       validate: {
         validator: (v) => {
-          return true;
+          return typeof v === 'string';
         }
-      }
+      },
+      message: 'The employee name must be insert.'
     },
     history: {
       type: String,
-      require: true,
+      required: true,
       trim: true,
       validate: {
         validator: (v) => {
-          return true;
+          return typeof v === 'string';
         }
-      }
+      },
+      message: 'The history can not be empty.'
     },
     ContactNumb: {
       type: String,
-      require: true,
+      required: true,
       trim: true,
       validate: {
         validator: (v) => {
           return npmValidator.isMobilePhone(v, ['en-AU', 'pt-PT']);
         },
-        message: 'the number phone do not format {VALUE}'
+        message: 'The number phone can not format {VALUE}.'
       }
     }
   }
@@ -98,10 +101,11 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
 
 
 let handleE11000 = function (error, doc, next) {
-  if (error.name === 'MongoError' && error.code === 11000) {
+  if (error.code === 11000) {
     next(new Error('File duplication error in database.'));
   } else {
-    next(error);
+    let err = new Error(error.message);
+    next(err);
   }
 };
 
@@ -112,4 +116,4 @@ employeeSchema.post('insertMany', handleE11000);
 
 const Employee = mongoose.model('employee', employeeSchema);
 
-export default {Employee , fieldNameDocuments};
+export default { Employee, fieldNameDocuments };

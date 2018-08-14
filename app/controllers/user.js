@@ -3,12 +3,15 @@ import flashUser from '../models/flashUser';
 import Token from '../models/MongooseODM/token';
 import hashedPassword from '../models/safety/secretCrypt';
 import generateIdLogin from '../models/safety/generateIdLogin';
-import sendEmailVericationUser from '../models/centralInformationModel';
+import sendEmailVericationUser from '../models/sendEmailCertificationUser';
 import errorMiddleware from '../middleware/errorMiddleware';
 import sendNewPage from '../middleware/sendNewPage';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
+import d from 'debug';
+
+
 
 let userController = {}
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -28,6 +31,7 @@ userController.login = function (req, res) {
  * Sign in with email and password
  */
 userController.loginPost = function (req, res, next) {
+  debug('POST /loginPost');
   let body = req.body, message = '';
   flashUser(req, res);
   User.findOne({ name: body.name }, function (err, user) {
@@ -60,12 +64,13 @@ userController.loginPost = function (req, res, next) {
 
 userController.logOut = function (req, res) {
   req.session = null;
-  res.redirect('/').end();
+  sendNewPage(res, 303, '/')
+
 };
 
 userController.registerUser = function (req, res, next) {
   flashUser(req, res);
-  res.render('register-user').end();
+  res.render('register-user');
 };
 
 /*
@@ -76,16 +81,21 @@ userController.registerUserPost = function (req, res, next) {
   flashUser(req, res);
   // make sure user doesn't confirm terms
   if (req.body.checkboxApplyTermsOfService !== 'true') {
-    if (err) errorMiddleware('the terms of services do not was applay', 428, next);
+    let err = new Error('The terms of services do not was applay.');
+    return errorMiddleware(err, 428, next);
+    console.log('hello');
   }
   // Make sure this account doesn't already exist
   // ** The beauty callback hell ** I am will resolve .
   User.findOne({ email: req.body.email }, function (err, user) {
-    if (err) errorMiddleware(err, 500, next);
+    if (err) return errorMiddleware(err, 500, next);
 
     // Make sure user doesn't already exist
-    if (user) errorMiddleware('The email address you have entered is already associated.' +
-      'with another account.', 400, next);
+    if (user) {
+      const err = new Error('The email address you have entered is already associated ' +
+      'with another account.');
+      return errorMiddleware(err, 400, next);
+    };
 
     const body = req.body;
     Object.freeze(body);
@@ -94,17 +104,17 @@ userController.registerUserPost = function (req, res, next) {
       if (err) return errorMiddleware(err, 400, next);
       user = new User(fileUser);
       user.validate(function (err) {
-        if (err) errorMiddleware(err, 428, next);
+        if (err) return errorMiddleware(err, 428, next);
       });
       user.save(function (err) {
-        if (err) return res.status(500).send({ msg: err.message }).end();
+        if (err) return errorMiddleware(err, 400, next);
         let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
         // Create a verification token for this user.
         let token = new Token({ _userId: user._id, token: tokenUserId });
 
         // Save date base of the verification token.
         token.save(function (err) {
-          if (err) errorMiddleware(err, 500, next);
+          if (err) return errorMiddleware(err, 500, next);
 
           // note: I still can not test with verication send email. 
           if (NODE_ENV !== 'test') {
@@ -114,7 +124,7 @@ userController.registerUserPost = function (req, res, next) {
                 + token.token + '.\n';
 
             setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
-              setup.mailOptions.to + '.';
+              user.email + '.';
 
             setupSendEmail.mailOptions = {
               from: 'no-reply@yourwebapplication.com',
@@ -132,44 +142,6 @@ userController.registerUserPost = function (req, res, next) {
         });
       });
     });
-
-    user.save(function (err) {
-      if (err) { return res.status(500).send({ msg: err.message }).end(); }
-
-      let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
-
-      // Create a verification token for this user.
-      let token = new Token({ _userId: user._id, token: tokenUserId });
-
-      // Save date base of the verification token.
-      token.save(function (err) {
-        if (err) errorMiddleware(err, 500, next);
-
-        // note: I still can not test with verication send email. 
-        if (NODE_ENV !== 'test') {
-          const setupSendEmail = {},
-            emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
-              +'the link: \nhttp:\/\/' + req.headers.host + '\/confirmation-register-user\/'
-              + token.token + '.\n';
-
-          setupSendEmail.messageFromUser = 'A verification email has been sent to ' +
-            setup.mailOptions.to + '.';
-
-          setupSendEmail.mailOptions = {
-            from: 'no-reply@yourwebapplication.com',
-            to: user.email,
-            subject: 'Account Verification Token',
-            text: emailText
-          };
-
-          setupSendEmail.res = res;
-          setupSendEmail.next = next;
-          sendEmailVericationUser(setupSendEmail);
-        } else {
-          res.status(200).render('confirm-token', { token: '/confirmation-register-user?token=' + token.token }).end();
-        }
-      });
-    });
   });
 };
 
@@ -181,7 +153,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
 
   // Find a matching token.
   Token.findOne({ token: req.query.token }, function (err, token) {
-    if (err) errorMiddleware(err, 500, next);
+    if (err) return errorMiddleware(err, 500, next);
 
     if (!token) {
       return res.status(400).send({

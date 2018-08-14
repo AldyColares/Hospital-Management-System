@@ -7,9 +7,7 @@
  */
 
 let errorMiddleware = (error, status, next) => {
-    if (!error.status) {
         error.status = status;
-    }
     return next(error);
 }
 
