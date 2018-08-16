@@ -38,7 +38,8 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
         validator: (v) => {
           return typeof v === 'string';
         }
-      }
+      },
+      message: 'The address must be...'
     },
     gender: {
       type: String,

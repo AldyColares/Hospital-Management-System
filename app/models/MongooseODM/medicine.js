@@ -41,7 +41,7 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        return validator.toDate(v);
+        return true;
       },
       message: 'the {VALUE} must be format number '
     }
@@ -52,9 +52,9 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        return true;
+        return validator.isNumeric(v);
       },
-      message: ''
+      message: 'The valor must be '
     }
   },
 

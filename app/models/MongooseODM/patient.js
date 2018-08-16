@@ -12,9 +12,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !validator.isEmpty(v);
+        return !validator.isAlphanumeric(v);
       },
-      message: '',
+      message: 'The Identification of patient must be combination of words and number.',
     }
   },
   name: {
@@ -24,9 +24,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !validator.isEmpty(v);
+        return !validator.isAlpha(v);
       },
-      message: '',
+      message: 'The name can not had number.',
     }
   },
   gender: {
@@ -36,9 +36,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !validator.isEmpty(v);
+        return v === 'male' && v === 'famele';
       },
-      message: '',
+      message: 'The gender must be male or famele.',
     }
   },
   // must be city, street and zip
@@ -59,7 +59,7 @@ let patientSchema = mongoose.Schema({
     required: true,
     validator: {
       validator: (v) => {
-        return !validator.isDate(v);
+        return true;
       },
       message: ''
     }
@@ -69,7 +69,7 @@ let patientSchema = mongoose.Schema({
     required: true,
     validator: {
       validator: (v) => {
-        return !validator.isDate(v);
+        return true;
       },
       message: ''
     }

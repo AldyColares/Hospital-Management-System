@@ -8,19 +8,38 @@ let recordSchema = mongoose.Schema({
     type: String,
     required: [true, 'Identification of patient is required.'],
     lowercare: true,
-    trim: true
+    trim: true,
+    validate: {
+      validator: (v) => {
+        return npmValidator.isAlphanumeric(v);
+      }
+    },
+    message: 'The ID of Patient must be Alpha and/or numeric.'
   },
   recordNo: {
     type: String,
     required: [true, 'Number of record is required.'],
     lowercare: true,
-    trim: true
+    trim: true, 
+    validate: {
+      validator: (v) => {
+        return npmValidator.isAlphanumeric(v);
+      }
+    },
+    message: 'The ID of record must be Alpha and/or numeric.'
+
   },
   discription: {
     type: String,
     required: [true, 'discription is required.'],
     lowercare: true,
-    trim: true,
+    trim: true, 
+    validate: {
+      validator: (v) => {
+        return npmValidator.isAlphanumeric(v);
+      }
+    },
+    message: 'ID of Employer must be Alpha and/or numeric.'
   },
   appoinmest: {
     type: String,

@@ -12,7 +12,7 @@ let roomSchema = mongoose.Schema({
       validator: (v) => {
         return !isEmpty(v);
       },
-      message: 'the room of type do not empty.',
+      message: 'The room of type do not empty.',
     }
   },
   /*roomId fist field is number, second field is floor hospital. Exemple: 11f2(number 11 of the 
@@ -27,7 +27,7 @@ let roomSchema = mongoose.Schema({
       validator: (v) => {
         return !isEmpty(v);
       },
-      message: 'the room of type do not empty.',
+      message: 'The room of type do not empty.',
     }
   },
   /* the period of patient will stay in the room. 
