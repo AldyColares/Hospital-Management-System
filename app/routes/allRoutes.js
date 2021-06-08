@@ -1,4 +1,3 @@
-
 import employee from './employee';
 import user from './user';
 import patient from './patient';
@@ -11,10 +10,12 @@ import mainPageUser from './mainPageUser';
 import handlingError from './handlingError';
 
 /**
-* The load all Router in the module.
+* It load all Router in the modules.
+*
 * @param {object} app - The framework Express.
 * @returns void. 
 */
+
 export default function(app) {
     user(app);
     mainPageUser(app);
