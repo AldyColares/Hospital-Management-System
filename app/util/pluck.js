@@ -3,7 +3,8 @@ import stringReplaceAt from './stringReplaceAt';
 
 /**
  * Pluck remove only properties of the object that need and return object them.
- * the first parameter is object and second is a array of name properties
+ * the first parameter is object and second is a array of name properties.
+ * 
  * @param  {object} Object - The object for extract proprietys. 
  * @param  {array}  keys - The list of name of properties of the object from the first parameter.
  * @param  {callback} callback - The asynchronous function return error or object.    

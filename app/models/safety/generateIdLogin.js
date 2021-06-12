@@ -4,7 +4,7 @@ let allNumbers = '1234567890';
 const SIZE_ID_LOGIN = 7;
 
 /**
-* The idLoing of user will be cobination of numbers and initials full name him.
+* The idLoging of user will be cobination of numbers and initials full name him.
 * @param {string} nameUser - The name of user for create idLogin.
 * @returns {string} idLogin 
 * @public
@@ -23,7 +23,7 @@ let idLogin = function (nameUser) {
 
 };
 
-// the function below will be used shema employee. Do not erase!
+// The function below will be used schema employee. Do not erase!
 let treeFirstLettersJob = (job) => {
   let partJob = job.substr(0, 3);
   partJob = partJob.toLowerCase();

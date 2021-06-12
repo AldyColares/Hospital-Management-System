@@ -11,7 +11,7 @@ import seed from '../app/util/seed';
 import connectBD from './database';
 import allRouter from '../app/routes/allRoutes';
 
-const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hour
+const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hours
 
 export default (function () {
     let app = express();

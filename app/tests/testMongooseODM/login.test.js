@@ -19,7 +19,7 @@ describe('POST /login', function () {
         expect(body.loginId).toNotBeA(undefined, ['loginId undefined']);
         expect(body.name).toEqual('user', ["onononon"]);
         expect(body.email).toEqual('exemple@gmail.com',['messagem email']);
-        // Save the cookie to use it later to retrieve the session
+        // Save the cookie to use it later to retrieve the session.
         Cookies = res.headers['set-cookie'].pop().split(';')[0];
         done();
       });

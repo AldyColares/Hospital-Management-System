@@ -93,7 +93,7 @@ userController.registerUserPost = function (req, res, next) {
     // Make sure user doesn't already exist
     if (user) {
       const err = new Error('The email address you have entered is already associated ' +
-      'with another account.');
+        'with another account.');
       return errorMiddleware(err, 400, next);
     };
 
@@ -102,6 +102,7 @@ userController.registerUserPost = function (req, res, next) {
     // Create model object and save the user.
     pluck(body, ['name', 'password', 'email', 'job', 'phone'], function (err, fileUser) {
       if (err) return errorMiddleware(err, 400, next);
+
       user = new User(fileUser);
       user.validate(function (err) {
         if (err) return errorMiddleware(err, 428, next);

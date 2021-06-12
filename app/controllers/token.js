@@ -15,13 +15,14 @@ controllerToken.registerToken = function (req, res, next) {
         .exec(function (err, token) {
             if (err) return errorMiddleware(err, 500, next);
             if (token) {
-                message = { message: 'The token you have entered is already associated.', token: token }
+                message = { message: 'The token you have entered is already associated.', 
+                    token: token }
                 return sendJsonResponse(res, 400, message);
             }
             pluck(body, ['tokenType', 'tokenId', 'period'], function(err, fileToken){
                 if (err) return errorMiddleware(err, 400, next);
                 
-                const newToken = new Token(filetoken);
+                const newToken = new Token(fileToken);
                 newToken.save(function (err, token) {
                     if (err) return errorMiddleware(err, 500, next);
                     message = { message: 'Register successfully!', token: token };
