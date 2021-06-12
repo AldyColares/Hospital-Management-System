@@ -117,7 +117,7 @@ userController.registerUserPost = function (req, res, next) {
         token.save(function (err) {
           if (err) return errorMiddleware(err, 500, next);
 
-          // note: I still can not test with verication send email. 
+          // note: I still can not test with verication send email for new user. 
           if (NODE_ENV !== 'test') {
             const setupSendEmail = {},
               emailText = 'Hello,\n\n' + 'Please verify your account by clicking' +
@@ -246,24 +246,27 @@ userController.deleteProfile = function (req, res, next) {
  * PUT /update-user/:id
  */
 userController.updateProfile = async function (req, res, next) {
-  const body = req.body,
-    idLoginUser = req.params.id,
-    update = pluck(body, 'birth', 'age', 'gender'),
-    options = { new: true, runValidators: true };
-  delete req.body.idLogin;
-  try {
-    let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser }, { set: { update } }, options);
-    console.log(updated);
-    if (!updatedUser) {
-      res.status(404).send().end()
-    } else {
-      res.status(200).redirect('update-profile').end();
+  const body = req.body, idLoginUser = req.params.id
+  pluck(body, ['birth', 'age', 'gender'], function (err, update) {
+    if (err) return errorMiddleware(err, 400, next);
 
+    options = { new: true, runValidators: true };
+    delete req.body.idLogin;
+    try {
+      let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser },
+        { set: { update } }, options);
+      //console.log(updated);
+      if (!updatedUser) {
+        res.status(404).send().end()
+      } else {
+        res.status(200).redirect('update-profile').end();
+
+      }
+    } catch (err) {
+      err.status = 500;
+      next(err);
     }
-  } catch (err) {
-    err.status = 500;
-    next(err);
-  }
+  }),
 };
 
 export default userController;
