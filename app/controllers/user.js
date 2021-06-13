@@ -12,7 +12,6 @@ import { sign } from 'jsonwebtoken';
 import d from 'debug';
 
 
-
 let userController = {}
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
@@ -181,7 +180,7 @@ userController.confirmationRegisterUser = function (req, res, next) {
       user.idLogin = generateIdLogin(user.name);
       res.user = user.idLogin;
       user.save(function (err) {
-        if (err) { return res.status(500).send({ msg: err.message }).end(); }
+        if (err) return res.status(500).send({ msg: err.message }).end();
       });
       // The user going redirect for main page.
 
@@ -246,27 +245,29 @@ userController.deleteProfile = function (req, res, next) {
  * PUT /update-user/:id
  */
 userController.updateProfile = async function (req, res, next) {
-  const body = req.body, idLoginUser = req.params.id
+  const body = req.body, idLoginUser = req.params.id,
+  options = { new: true, runValidators: true }
   pluck(body, ['birth', 'age', 'gender'], function (err, update) {
-    if (err) return errorMiddleware(err, 400, next);
-
-    options = { new: true, runValidators: true };
+    if (err) return errorMiddleware(err, 404, next);
+    
+    //The JavaScript delete operator removes a property from an object.
     delete req.body.idLogin;
     try {
       let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser },
         { set: { update } }, options);
       //console.log(updated);
       if (!updatedUser) {
-        res.status(404).send().end()
+        return errorMiddleware(err, 404, next);
+        //res.status(404).send().end()
+        
       } else {
-        res.status(200).redirect('update-profile').end();
-
+        return sendJsonResponse(res, 200, 'Update successfull', next);
+        //res.status(200).redirect('update-profile').end();
       }
     } catch (err) {
-      err.status = 500;
-      next(err);
+      errorMiddleware(err, 500, next);
     }
-  }),
+  })
 };
 
 export default userController;
