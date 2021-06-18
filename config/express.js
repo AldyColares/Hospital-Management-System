@@ -40,7 +40,7 @@ export default (function () {
   }));
 
   app.use(flash());
-  app.use(bodyparse.urlencoded({ extended: false }));
+  app.use(express.urlencoded({ extended: true }));
   // imediatamente após a inicialização da sessão do Passport
   //app.use(helmet.xframe());
   app.use(express.static('./public'));
