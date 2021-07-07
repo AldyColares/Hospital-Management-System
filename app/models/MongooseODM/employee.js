@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import npmValidator from 'validator';
+import validator from 'validator';
 
 const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName',
   'history', 'ContactNumb'],
@@ -12,7 +12,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
       unique: true,
       validate: {
         validator: (v) => {
-          return npmValidator.isAlphanumeric(v);
+          return validator.isAlphanumeric(v);
         }
       },
       message: 'ID of Employer must be Alpha and/or numeric.'
@@ -26,7 +26,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
       max: [7000, 'the salary much high.'],
       validate: {
         validator: (v) => {
-          return validator.isNumeric(v);
+          return validator.isNumeric(v.toString());
         }
       },
       message: 'the salary {VALUE} must be number'
@@ -49,7 +49,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
         validator: (v) => {
           return (v === 'male' || v === 'famale');
         },
-        message: 'The name of field gender must has "male" or "famele".'
+        message: 'The name of gender field must has "male" or "famele".'
       }
     },
     NID: {
@@ -92,7 +92,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
       trim: true,
       validate: {
         validator: (v) => {
-          return npmValidator.isMobilePhone(v, ['en-AU', 'pt-PT']);
+          return validator.isMobilePhone(v, ['en-AU', 'pt-PT']);
         },
         message: 'The number phone can not format {VALUE}.'
       }

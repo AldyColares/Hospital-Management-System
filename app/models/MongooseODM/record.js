@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import npmValidate from 'validator';
+import validator from 'validator';
 
 const listElements = ['patientId', 'recordNo', 'discription', 'appoinmest'];
 
@@ -11,7 +11,7 @@ let recordSchema = mongoose.Schema({
     trim: true,
     validate: {
       validator: (v) => {
-        return npmValidator.isAlphanumeric(v);
+        return validator.isAlphanumeric(v);
       }
     },
     message: 'The ID of Patient must be Alpha and/or numeric.'
@@ -23,7 +23,7 @@ let recordSchema = mongoose.Schema({
     trim: true, 
     validate: {
       validator: (v) => {
-        return npmValidator.isAlphanumeric(v);
+        return validator.isAlphanumeric(v);
       }
     },
     message: 'The ID of record must be Alpha and/or numeric.'
@@ -36,11 +36,12 @@ let recordSchema = mongoose.Schema({
     trim: true, 
     validate: {
       validator: (v) => {
-        return npmValidator.isAlphanumeric(v);
+        return validator.isAlphanumeric(v);
       }
     },
     message: 'ID of Employer must be Alpha and/or numeric.'
   },
+  
   appoinmest: {
     type: String,
     required: [true, 'appoinmest is required.'],

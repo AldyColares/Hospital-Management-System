@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { isEmpty } from 'validator';
+import validator from 'validator';
 
 const atributesRoom = ['roomType', 'roomId', 'period'];
 let roomSchema = mongoose.Schema({
@@ -10,7 +10,7 @@ let roomSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return validator.isEmpty(v);
       },
       message: 'The room of type do not empty.',
     }
@@ -25,7 +25,7 @@ let roomSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return validator.isEmpty(v);
       },
       message: 'The room of type do not empty.',
     }
@@ -37,7 +37,7 @@ let roomSchema = mongoose.Schema({
     require: true,
     validator: {
       validator: (v) => {
-        return !isEmpty(v);
+        return validator.isDate(v);
       },
       message: 'the room of type do not empty.',
     }
@@ -60,4 +60,3 @@ roomSchema.post('insertMany', handleE11000);
 
 let Room = mongoose.model('room', roomSchema);
 export default { Room };
-
