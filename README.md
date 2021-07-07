@@ -12,9 +12,9 @@ do de exames, etc.
 ## Como usar
 requisitos 
 - Node >= 14.17.x 
-- Mongo >= 3.8.x
+- Mongo >= 3.6.x
 
-O mesmo diretório onde esta o projeto, digita abaixo na linha de comando.  
+O diretório onde esta o projeto, digita abaixo na linha de comando.  
 
 ```sh
 cd Hospital-Management-System

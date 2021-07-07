@@ -52,7 +52,8 @@ let MedicineSchema = mongoose.Schema({
     required: true,
     validate: {
       validator: (v) => {
-        return validator.isNumeric(v);
+        console.log( typeof v == "number", v )
+        return validator.isNumeric(v.toString());
       },
       message: 'The valor must be '
     }
@@ -74,8 +75,7 @@ let handleE11000 = function (error, doc, next) {
   if (error.code === 11000) {
     next(new Error('File duplication error in database.'));
   } else {
-    let err = new Error(error.message);
-    next(err);
+    next(new Error(error.message));
   }
 };
 

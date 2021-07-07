@@ -83,7 +83,7 @@ UserSchema.methods.checkPassword = function (guess, callback) {
 
 UserSchema.methods.generateAuthToken = function () {
   let user = this;
-  let token = sign({ _id: user._id.toHexString(), role: user.role }, chashedPassword.toString());
+  let token = sign({ _id: user._id.toHexString(), role: user.role }, hashedPassword.toString());
   user.token = token;
 
   return user.save().then(() => {

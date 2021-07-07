@@ -247,7 +247,7 @@ userController.deleteProfile = function (req, res, next) {
 userController.updateProfile = async function (req, res, next) {
   const body = req.body, idLoginUser = req.params.id,
   options = { new: true, runValidators: true }
-  pluck(body, ['birth', 'age', 'gender'], function (err, update) {
+  pluck(body, ['birth', 'age', 'gender'], async function (err, update) {
     if (err) return errorMiddleware(err, 404, next);
     
     //The JavaScript delete operator removes a property from an object.
