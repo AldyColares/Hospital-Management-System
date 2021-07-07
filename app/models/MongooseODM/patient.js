@@ -36,9 +36,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return v === 'male' && v === 'famele';
+        return v === 'male' || v === 'famale';
       },
-      message: 'The gender must be male or famele.',
+      message: 'The gender must be male or famale.',
     }
   },
   // must be city, street and zip
