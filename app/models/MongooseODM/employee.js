@@ -29,7 +29,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
           return validator.isNumeric(v.toString());
         }
       },
-      message: 'the salary {VALUE} must be number'
+      message: 'The salary {VALUE} must be number'
     },
     EAddress: {
       type: String,
@@ -49,7 +49,7 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
         validator: (v) => {
           return (v === 'male' || v === 'famale');
         },
-        message: 'The name of gender field must has "male" or "famele".'
+        message: 'The name of gender field must be "male" or "famele".'
       }
     },
     NID: {

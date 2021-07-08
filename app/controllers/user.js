@@ -109,7 +109,7 @@ userController.registerUserPost = function (req, res, next) {
       user.save(function (err) {
         if (err) return errorMiddleware(err, 400, next);
         let tokenUserId = sign({ _id: user._id.toHexString() }, hashedPassword);
-        // Create a verification token for this user.
+        // Create a verification token for user.
         let token = new Token({ _userId: user._id, token: tokenUserId });
 
         // Save date base of the verification token.

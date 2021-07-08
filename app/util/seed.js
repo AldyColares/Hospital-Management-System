@@ -20,6 +20,7 @@ export default function () {
       console.info('insert account admin! id: jm948d password: userOnePass');
     }
   });
+  
   Medicine.findOne({ name: 'testMedicine' }, function (err, medicine) {
     if (!medicine) {
       medicine = new Medicine({

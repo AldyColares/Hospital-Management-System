@@ -1,8 +1,7 @@
 import express from 'express';
 import compression from 'compression';
-import logger from 'morgan';
+import morgan from 'morgan';
 import helmet from 'helmet';
-import bodyparse from 'body-parser';
 import flash from 'connect-flash';
 import session from 'cookie-session';
 import cookieParser from 'cookie-parser';
@@ -15,8 +14,10 @@ const EXPIRE_DATE_IN_DAY = new Date(Date.now() + 60 * 60 * 1000 * 24); // 24 hou
 
 export default (function () {
   let app = express();
+
   // the set up Data base.
   configDatabase;
+  
   //app.use(compression);
   app.use(helmet());
   app.disable('x-powered-by');
@@ -24,7 +25,8 @@ export default (function () {
   connectBD();
   // insert documents in the data base.
   seed();
-  app.use(logger('dev'));
+  
+  app.use(morgan('dev'));
 
   // configuração de ambiente
   app.set('port', process.env.PORT || 3000);

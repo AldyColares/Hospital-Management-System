@@ -2,8 +2,9 @@
 
 Sistema de gerenciamento hospitar.
 
-O projeto será escrito com as tecnologias Mongo, Express, React e Node, 
-API REST, etc.
+O projeto será escrito com as tecnologias Mongo, Express, React e Node.
+O site dos requisitos que foram usados para obra: 
+https://www.lovelycoding.org/hospital-management-system-project-for-final-year/
 
 Ele oferece serviços de rotinas para hospitais. Por exemplo, registro de 
 paciente, laudo médico, receita médica, pagamento dos serviços médicos, resulta-

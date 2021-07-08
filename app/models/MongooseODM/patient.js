@@ -3,7 +3,7 @@ import validator from 'validator';
 
 const atributesPacient = ['pid', 'name', 'gender',
   'address', 'dateAdmited', 'dateDischarged', 'contactNo'];
-   
+
 let patientSchema = mongoose.Schema({
   pid: {
     type: String,
@@ -12,9 +12,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !validator.isAlphanumeric(v);
+        return validator.isAlphanumeric(v);
       },
-      message: 'The Identification of patient must be combination of words and number.',
+      message: 'The identification of patient must be combination of words and number.',
     }
   },
   name: {
@@ -24,9 +24,9 @@ let patientSchema = mongoose.Schema({
     trim: true,
     validator: {
       validator: (v) => {
-        return !validator.isAlpha(v);
+        return validator.isAlpha(v);
       },
-      message: 'The name can not had number.',
+      message: 'The name can not has number.',
     }
   },
   gender: {
@@ -51,7 +51,7 @@ let patientSchema = mongoose.Schema({
       validator: (v) => {
         return !validator.isEmpty(v);
       },
-      message: ''
+      message: 'The address is...'
     }
   },
   dateAdmited: {
@@ -59,7 +59,7 @@ let patientSchema = mongoose.Schema({
     required: true,
     validator: {
       validator: (v) => {
-        return true;
+        return validator.isDate(v);
       },
       message: ''
     }
@@ -69,7 +69,7 @@ let patientSchema = mongoose.Schema({
     required: true,
     validator: {
       validator: (v) => {
-        return true;
+        return validator.isDate(v);
       },
       message: ''
     }
