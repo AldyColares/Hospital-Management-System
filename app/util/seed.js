@@ -1,5 +1,6 @@
 import User from '../models/MongooseODM/user';
 import Medicine from '../models/MongooseODM/medicine';
+import Employee from '../models/MongooseODM/employee';
 
 // Insert documents of collection for test or es
 export default function () {
@@ -34,4 +35,19 @@ export default function () {
       console.info('insert medicine: testMedicine');
     }
   });
+
+  Employee.findOne({EID: 'ae47'}, function(err, employee){
+    if(! employee ) {
+      employee = new Employee({
+        EID: 'ae47', 
+        Salary: 5487, 
+        EAddress: 'Major Henrique', 
+        gender: 'female', 
+        NID: '34fj', 
+        EName: 'mr. Cormes',
+        history: 'ufsuwlkekjsdfiukjdfjejsdf', 
+        ContactNumb: '58545855',
+      });
+    }
+  })
 };
