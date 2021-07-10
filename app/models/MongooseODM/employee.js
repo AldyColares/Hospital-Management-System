@@ -1,3 +1,4 @@
+import { stringContaining } from 'expect';
 import mongoose from 'mongoose';
 import validator from 'validator';
 
@@ -47,9 +48,9 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
       trim: true,
       validate: {
         validator: (v) => {
-          return (v === 'male' || v === 'famale');
+          return (v === 'male' || v === 'female');
         },
-        message: 'The name of gender field must be "male" or "famele".'
+        message: 'The name of gender field must be "male" or "female".'
       }
     },
     NID: {
@@ -92,7 +93,8 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
       trim: true,
       validate: {
         validator: (v) => {
-          return validator.isMobilePhone(v, ['en-AU', 'pt-PT']);
+          //return validator.isMobilePhone(v, ['en-AU', 'pt-PT']);
+          return typeof v === 'string';
         },
         message: 'The number phone can not format {VALUE}.'
       }
@@ -115,6 +117,6 @@ employeeSchema.post('update', handleE11000);
 employeeSchema.post('findOneAndUpdate', handleE11000);
 employeeSchema.post('insertMany', handleE11000);
 
-const Employee = mongoose.model('employee', employeeSchema);
+let Employee = mongoose.model('employee', employeeSchema);
 
-export default { Employee, fieldNameDocuments };
+export default Employee;

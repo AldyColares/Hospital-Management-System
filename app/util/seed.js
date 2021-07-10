@@ -36,7 +36,7 @@ export default function () {
     }
   });
 
-  Employee.findOne({EID: 'ae47'}, function(err, employee){
+  Employee.findOne({ EID: 'ae47' }, function(err, employee){
     if(! employee ) {
       employee = new Employee({
         EID: 'ae47', 
@@ -46,8 +46,10 @@ export default function () {
         NID: '34fj', 
         EName: 'mr. Cormes',
         history: 'ufsuwlkekjsdfiukjdfjejsdf', 
-        ContactNumb: '58545855',
+        ContactNumb: '558589207785',
       });
+      employee.save(err);
+      console.info('Insert employee: ae47');
     }
   })
 };
