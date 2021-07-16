@@ -16,7 +16,7 @@ export default function () {
         idLogin: 'jm948d',
         phone: '999999999'
       });
-      user.save(err);
+      user.save();
       user.generateAuthToken();
       console.info('insert account admin! id: jm948d password: userOnePass');
     }
@@ -31,24 +31,24 @@ export default function () {
         expiration: new Date(2020, 10, 20),
         prize: 3.40,
       });
-      medicine.save(err);
+      medicine.save();
       console.info('insert medicine: testMedicine');
     }
   });
 
   Employee.findOne({ EID: 'ae47' }, function(err, employee){
-    if(! employee ) {
+    if(!employee ) {
       employee = new Employee({
         EID: 'ae47', 
         Salary: 5487, 
         EAddress: 'Major Henrique', 
         gender: 'female', 
         NID: '34fj', 
-        EName: 'mr. Cormes',
+        EName: 'miss Cormes',
         history: 'ufsuwlkekjsdfiukjdfjejsdf', 
         ContactNumb: '558589207785',
       });
-      employee.save(err);
+      employee.save();
       console.info('Insert employee: ae47');
     }
   })

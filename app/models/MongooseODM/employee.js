@@ -102,13 +102,11 @@ const fieldNameDocuments = ['EID', 'Salary', 'EAddress', 'gender', 'NID', 'EName
   }
   );
 
-
 let handleE11000 = function (error, doc, next) {
   if (error.code === 11000) {
-    next(new Error('File duplication error in database.'));
+    next(new Error('There was a duplicate key error'));
   } else {
-    let err = new Error(error.message);
-    next(err);
+    next(error);
   }
 };
 

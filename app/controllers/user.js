@@ -9,7 +9,7 @@ import sendNewPage from '../middleware/sendNewPage';
 import sendJsonResponse from '../models/sendJsonResponse';
 import pluck from '../util/pluck';
 import { sign } from 'jsonwebtoken';
-import d from 'debug';
+import debug from 'debug';
 
 
 let userController = {}
@@ -82,10 +82,9 @@ userController.registerUserPost = function (req, res, next) {
   if (req.body.checkboxApplyTermsOfService !== 'true') {
     let err = new Error('The terms of services do not was applay.');
     return errorMiddleware(err, 428, next);
-    console.log('hello');
   }
   // Make sure this account doesn't already exist
-  // ** The beauty callback hell ** I am will resolve .
+  // ** The beauty callback hell ** I am will resolve.
   User.findOne({ email: req.body.email }, function (err, user) {
     if (err) return errorMiddleware(err, 500, next);
 
@@ -246,24 +245,23 @@ userController.deleteProfile = function (req, res, next) {
  */
 userController.updateProfile = async function (req, res, next) {
   const body = req.body, idLoginUser = req.params.id,
-  options = { new: true, runValidators: true }
+    options = { new: true, runValidators: true }
   pluck(body, ['birth', 'age', 'gender'], async function (err, update) {
     if (err) return errorMiddleware(err, 404, next);
-    
+
     //The JavaScript delete operator removes a property from an object.
     delete req.body.idLogin;
     try {
       let updatedUser = await User.findOneAndUpdate({ IdLogin: idLoginUser },
         { set: { update } }, options);
-      //console.log(updated);
       if (!updatedUser) {
-        return errorMiddleware(err, 404, next);
-        //res.status(404).send().end()
-        
-      } else {
-        return sendJsonResponse(res, 200, 'Update successfull', next);
-        //res.status(200).redirect('update-profile').end();
+        const error = new Error("The file from update do not find out.");
+        return errorMiddleware(error, 404, next);
       }
+
+      return sendJsonResponse(res, 200, 'Update successfull', next);
+      //res.status(200).redirect('update-profile').end();
+
     } catch (err) {
       errorMiddleware(err, 500, next);
     }
