@@ -31,7 +31,7 @@
     "nodemailer": "^6.6.1",
     "passport": "^0.4.1",
     "shortid": "^2.2.16",
-    "validator": "^10.4.0"
+    "validator": "^13.7.0"
   },
   "devDependencies": {
     "@types/debug": "0.0.30",
