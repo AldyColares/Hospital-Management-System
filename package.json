@@ -36,7 +36,7 @@
   "devDependencies": {
     "@types/debug": "0.0.30",
     "expect": "^26.4.2",
-    "mocha": "^8.1.3",
+    "mocha": "^8.4.0",
     "morgan": "^1.10.0",
     "nodemon": "^2.0.7",
     "supertest": "^3.1.0"
